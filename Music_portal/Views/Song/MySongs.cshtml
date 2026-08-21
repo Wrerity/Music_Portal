@@ -1,0 +1,53 @@
+@model List<SongDisplayViewModel>
+@{
+    ViewData["Title"] = "Мои песни";
+}
+
+<h2 class="text-accent">Мои песни</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (Model.Count == 0)
+{
+    <p class="text-dark-custom">Вы ещё не загрузили ни одной песни.</p>
+    <a asp-action="Create" class="btn btn-accent">Добавить песню</a>
+}
+else
+{
+    <div class="admin-table-wrapper mt-3">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Название</th>
+                    <th>Авторы</th>
+                    <th>Жанры</th>
+                    <th>Прослушивания</th>
+                    <th class="admin-th-actions">Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var song in Model)
+                {
+                    <tr>
+                        <td><a asp-action="Details" asp-route-id="@song.Id">@song.Title</a></td>
+                        <td>@song.Authors</td>
+                        <td>@song.Genres</td>
+                        <td>@song.PlayCount</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@song.Id" class="admin-btn admin-btn-sm admin-btn-primary">Редактировать</a>
+                            <form asp-action="Delete" asp-route-id="@song.Id" method="post" class="d-inline" onsubmit="return confirm('Удалить песню?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="admin-btn admin-btn-sm admin-btn-reject">Удалить</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<a asp-action="Index" asp-controller="Home" class="btn btn-outline-dark-custom mt-2">На главную</a>

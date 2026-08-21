@@ -1,0 +1,74 @@
+@model AdminSongEditViewModel
+@{
+    ViewData["Title"] = "Редактирование песни";
+}
+
+<div class="admin-header">
+    <h1 class="admin-title">Редактирование песни</h1>
+</div>
+
+<form asp-action="SongEdit" method="post" enctype="multipart/form-data" class="admin-form">
+    <input type="hidden" asp-for="Id" />
+
+    <div asp-validation-summary="ModelOnly" class="admin-validation"></div>
+
+    <div class="admin-form-group">
+        <label asp-for="Title" class="admin-label"></label>
+        <input asp-for="Title" class="admin-input" />
+        <span asp-validation-for="Title" class="admin-field-error"></span>
+    </div>
+
+    <div class="admin-form-group">
+        <label asp-for="UserId" class="admin-label">Пользователь (загрузивший)</label>
+        <select asp-for="UserId" class="admin-input" asp-items="@(new SelectList(Model.AllUsers, "Id", "Username", Model.UserId))">
+        </select>
+    </div>
+
+    <div class="admin-form-group">
+        <label class="admin-label">Авторы</label>
+        <select asp-for="AuthorIds" class="admin-input" multiple="multiple"
+                asp-items="@(new MultiSelectList(Model.AllAuthors, "Id", "Name", Model.AuthorIds))">
+        </select>
+        <small class="admin-hint">Зажмите Ctrl для выбора нескольких</small>
+    </div>
+
+    <div class="admin-form-group">
+        <label asp-for="NewAuthorName" class="admin-label">Или добавьте нового автора</label>
+        <input asp-for="NewAuthorName" class="admin-input" placeholder="Имя нового автора" />
+    </div>
+
+    <div class="admin-form-group">
+        <label class="admin-label">Жанры</label>
+        <select asp-for="GenreIds" class="admin-input" multiple="multiple"
+                asp-items="@(new MultiSelectList(Model.AllGenres, "Id", "Name", Model.GenreIds))">
+        </select>
+        <small class="admin-hint">Зажмите Ctrl для выбора нескольких</small>
+    </div>
+
+    <div class="admin-form-group">
+        <label asp-for="Duration" class="admin-label">Длительность (сек.)</label>
+        <input asp-for="Duration" class="admin-input" type="number" min="0" />
+        <span asp-validation-for="Duration" class="admin-field-error"></span>
+    </div>
+
+    <div class="admin-form-group">
+        <label asp-for="Lyrics" class="admin-label">Текст</label>
+        <textarea asp-for="Lyrics" class="admin-input" rows="5"></textarea>
+        <span asp-validation-for="Lyrics" class="admin-field-error"></span>
+    </div>
+
+    <div class="admin-form-group">
+        <label asp-for="AudioFile" class="admin-label">Заменить аудиофайл (оставьте пустым, чтобы не менять)</label>
+        <input asp-for="AudioFile" class="admin-input" type="file" accept=".mp3,.wav" />
+        <span asp-validation-for="AudioFile" class="admin-field-error"></span>
+    </div>
+
+    <div class="admin-form-actions">
+        <button type="submit" class="admin-btn admin-btn-primary">Сохранить</button>
+        <a asp-action="Songs" class="admin-btn admin-btn-secondary">Отмена</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

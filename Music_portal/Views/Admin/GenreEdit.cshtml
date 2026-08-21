@@ -1,0 +1,35 @@
+@model AdminGenreViewModel
+@{
+    ViewData["Title"] = "Редактирование жанра";
+}
+
+<div class="admin-header">
+    <h1 class="admin-title">Редактирование жанра</h1>
+</div>
+
+<form asp-action="GenreEdit" method="post" class="admin-form">
+    <input type="hidden" asp-for="Id" />
+
+    <div asp-validation-summary="ModelOnly" class="admin-validation"></div>
+
+    <div class="admin-form-group">
+        <label asp-for="Name" class="admin-label"></label>
+        <input asp-for="Name" class="admin-input" />
+        <span asp-validation-for="Name" class="admin-field-error"></span>
+    </div>
+
+    <div class="admin-form-group">
+        <label asp-for="Description" class="admin-label"></label>
+        <textarea asp-for="Description" class="admin-input" rows="3"></textarea>
+        <span asp-validation-for="Description" class="admin-field-error"></span>
+    </div>
+
+    <div class="admin-form-actions">
+        <button type="submit" class="admin-btn admin-btn-primary">Сохранить</button>
+        <a asp-action="Genres" class="admin-btn admin-btn-secondary">Отмена</a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

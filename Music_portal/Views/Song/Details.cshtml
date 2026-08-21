@@ -1,0 +1,68 @@
+@using Music_portal.Utils
+@model SongDetailViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    var isAuth = User.Identity?.IsAuthenticated == true;
+    var canEdit = isAuth && User.GetUserId() == Model.UserId;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-dark-custom">
+            <div class="card-header" style="background: var(--dark); color: var(--white);">
+                <h3 class="mb-0">@Model.Title</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong class="text-dark-custom">Авторы:</strong>
+                    <span>@string.Join(", ", Model.Authors)</span>
+                </div>
+                <div class="mb-3">
+                    <strong class="text-dark-custom">Жанры:</strong>
+                    <span>@string.Join(", ", Model.Genres)</span>
+                </div>
+                <div class="mb-3">
+                    <strong class="text-dark-custom">Длительность:</strong>
+                    <span>@Model.DurationFormatted</span>
+                </div>
+                <div class="mb-3">
+                    <strong class="text-dark-custom">Дата загрузки:</strong>
+                    <span>@Model.UploadDate.ToString("dd.MM.yyyy")</span>
+                </div>
+                <div class="mb-3">
+                    <strong class="text-dark-custom">Прослушиваний:</strong>
+                    <span>@Model.PlayCount</span>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Lyrics))
+                {
+                    <div class="mb-3">
+                        <strong class="text-dark-custom">Текст песни:</strong>
+                        <pre class="mt-2 p-3 bg-custom-light border border-dark-custom rounded" style="white-space:pre-wrap;font-family:inherit;">@Model.Lyrics</pre>
+                    </div>
+                }
+
+                @if (isAuth)
+                {
+                    <a asp-action="Download" asp-route-id="@Model.Id" class="btn btn-accent btn-no-hover">
+                        <img src="~/icons/download.svg" alt="" width="16" height="16" style="filter:brightness(0) invert(1);vertical-align:middle;margin-right:4px;" /> Скачать
+                    </a>
+                }
+                else
+                {
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-dark-custom btn-no-hover">Войдите, чтобы скачать</a>
+                }
+
+                @if (canEdit)
+                {
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-dark-custom ms-2 btn-no-hover">Редактировать</a>
+                    <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('Удалить песню?');">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-dark-custom ms-2 btn-no-hover">Удалить</button>
+                    </form>
+                }
+            </div>
+        </div>
+        <a asp-action="Index" asp-controller="Home" class="btn btn-outline-dark-custom mt-3">На главную</a>
+    </div>
+</div>

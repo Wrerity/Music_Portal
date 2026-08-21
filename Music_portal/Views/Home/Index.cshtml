@@ -1,0 +1,143 @@
+﻿@using Music_portal.Utils
+@model CatalogViewModel
+@{
+    ViewData["Title"] = "Главная";
+}
+
+<div class="text-center mb-4">
+    <h1 class="display-4 text-accent">Добро пожаловать на Музыкальный портал</h1>
+</div>
+
+<form method="get" asp-action="Index" class="row g-2 mb-4 align-items-end">
+    <div class="col-md-4">
+        <label class="form-label text-dark-custom">Поиск</label>
+        <input type="text" name="search" class="form-control" value="@Model.SearchTerm" placeholder="Название трека..." />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label text-dark-custom">Жанры</label>
+        <select name="genreIds" class="form-select">
+            <option value="">Все жанры</option>
+            @foreach (var g in Model.AllGenres)
+            {
+                <option value="@g.Id" selected="@Model.SelectedGenreIds.Contains(g.Id)">@g.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label text-dark-custom">Сортировка</label>
+        <select name="sortBy" class="form-select">
+            <option value="date" selected="@(Model.SortBy=="date")">Новые</option>
+            <option value="popularity" selected="@(Model.SortBy=="popularity")">Популярные</option>
+            <option value="title" selected="@(Model.SortBy=="title")">По названию</option>
+        </select>
+    </div>
+    <div class="col-md-4 d-flex gap-1 align-items-end">
+        <button type="submit" class="btn btn-accent flex-fill">Применить</button>
+        <a asp-action="Index" class="btn btn-outline-dark-custom flex-fill">Сброс</a>
+    </div>
+</form>
+
+<div class="song-grid">
+    @foreach (var song in Model.Songs)
+    {
+        <div class="song-card">
+            <div class="song-image">
+                <img src="~/icons/Play.svg" alt="Play" width="48" height="48" style="opacity:0.7;filter:brightness(0) invert(1);" />
+            </div>
+            <button class="btn-play" title="Слушать" data-song-id="@song.Id">
+                <img src="~/icons/Play.svg" class="play-icon" alt="Play" width="14" height="14" style="filter:brightness(0) invert(1);vertical-align:middle;" />
+            </button>
+            <div class="song-title"><a asp-controller="Song" asp-action="Details" asp-route-id="@song.Id">@song.Title</a></div>
+            <div class="song-listeners">@song.PlayCount слушателей</div>
+            <div class="song-genres">@ViewHelper.TruncateGenres(song.Genres)</div>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="song-download">
+                    <a asp-controller="Song" asp-action="Download" asp-route-id="@song.Id" class="btn btn-dark-custom btn-sm w-100 rounded-0">
+                        <img src="~/icons/download.svg" alt="Download" width="12" height="12" style="filter:brightness(0) invert(1);vertical-align:middle;margin-right:4px;" /> Скачать
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="song-download">
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-dark-custom btn-sm w-100 rounded-0">Войдите, чтобы скачать</a>
+                </div>
+            }
+            <div class="player-bar" style="display:none;">
+                <input type="range" class="player-volume" min="1" max="100" value="50" />
+            </div>
+        </div>
+    }
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            @for (int p = 1; p <= Model.TotalPages; p++)
+            {
+                <li class="page-item @(p == Model.Page ? "active" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { search = Model.SearchTerm, sortBy = Model.SortBy, page = p })@ViewHelper.GenreQuery(Model.SelectedGenreIds)">@p</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+@section Scripts {
+    <script>
+        var currentAudio = null;
+        var currentBtn = null;
+        var currentCard = null;
+
+        document.querySelectorAll('.btn-play').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var card = this.closest('.song-card');
+                var bar = card.querySelector('.player-bar');
+                var volumeInput = bar.querySelector('.player-volume');
+                var songId = this.getAttribute('data-song-id');
+                var icon = this.querySelector('.play-icon');
+
+                if (currentAudio && currentAudio.dataset.songId === songId && !currentAudio.paused) {
+                    currentAudio.pause();
+                    icon.src = '/icons/Play.svg';
+                    bar.style.display = 'none';
+                    return;
+                }
+
+                if (currentAudio) {
+                    currentAudio.pause();
+                    if (currentBtn) {
+                        currentBtn.querySelector('.play-icon').src = '/icons/Play.svg';
+                    }
+                    if (currentCard) {
+                        currentCard.querySelector('.player-bar').style.display = 'none';
+                    }
+                }
+
+                currentAudio = new Audio('/Song/Stream/' + songId);
+                currentAudio.dataset.songId = songId;
+                currentAudio.volume = volumeInput.value / 100;
+                currentBtn = this;
+                currentCard = card;
+                icon.src = '/icons/Stop.svg';
+                bar.style.display = 'flex';
+                currentAudio.play();
+
+                volumeInput.oninput = function () {
+                    currentAudio.volume = this.value / 100;
+                };
+
+                currentAudio.addEventListener('ended', function () {
+                    icon.src = '/icons/Play.svg';
+                    bar.style.display = 'none';
+                    currentAudio = null;
+                    currentBtn = null;
+                    currentCard = null;
+                });
+            });
+        });
+    </script>
+}
+

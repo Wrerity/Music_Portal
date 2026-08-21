@@ -1,0 +1,82 @@
+@model Music_portal.ViewModels.Admin.DashboardStats
+@{
+    ViewData["Title"] = "Админ-панель";
+}
+
+<div class="admin-page-layout">
+    <div class="admin-header">
+        <h1 class="admin-title">Панель управления</h1>
+        <p class="admin-subtitle">Управление музыкальным порталом</p>
+    </div>
+
+    <div class="admin-dashboard">
+        <a asp-action="Users" class="admin-card">
+            <div class="admin-card-icon">
+                <img src="~/icons/People.svg" alt="Users" width="32" height="32" />
+            </div>
+            <div class="admin-card-body">
+                <div class="admin-card-number">@Model.TotalUsers</div>
+                <div class="admin-card-label">Пользователи</div>
+            </div>
+        </a>
+        <a asp-action="PendingRequests" class="admin-card">
+            <div class="admin-card-icon">
+                <img src="~/icons/request.svg" alt="Requests" width="32" height="32" />
+            </div>
+            <div class="admin-card-body">
+                <div class="admin-card-number">@Model.PendingCount</div>
+                <div class="admin-card-label">Заявки</div>
+            </div>
+        </a>
+        <a asp-action="Songs" class="admin-card">
+            <div class="admin-card-icon">
+                <img src="~/icons/Play.svg" alt="Songs" width="32" height="32" />
+            </div>
+            <div class="admin-card-body">
+                <div class="admin-card-number">@Model.TotalSongs</div>
+                <div class="admin-card-label">Песни</div>
+            </div>
+        </a>
+        <a asp-action="Genres" class="admin-card">
+            <div class="admin-card-icon">
+                <img src="~/icons/tags.svg" alt="Genres" width="32" height="32" />
+            </div>
+            <div class="admin-card-body">
+                <div class="admin-card-number">@Model.TotalGenres</div>
+                <div class="admin-card-label">Жанры</div>
+            </div>
+        </a>
+        <a asp-action="Authors" class="admin-card">
+            <div class="admin-card-icon">
+                <img src="~/icons/People.svg" alt="Authors" width="32" height="32" />
+            </div>
+            <div class="admin-card-body">
+                <div class="admin-card-number">@Model.TotalAuthors</div>
+                <div class="admin-card-label">Авторы</div>
+            </div>
+        </a>
+    </div>
+
+    <div class="admin-nav-list mt-4">
+        <a asp-action="Users" class="admin-nav-item">
+            <span><img src="~/icons/People.svg" alt="" width="20" height="20" style="vertical-align:middle;margin-right:8px;" /> Пользователи</span>
+            <small>Управление учётными записями</small>
+        </a>
+        <a asp-action="PendingRequests" class="admin-nav-item">
+            <span><img src="~/icons/request.svg" alt="" width="20" height="20" style="vertical-align:middle;margin-right:8px;" /> Заявки на регистрацию</span>
+            <small>@Model.PendingCount ожидающих подтверждения</small>
+        </a>
+        <a asp-action="Genres" class="admin-nav-item">
+            <span><img src="~/icons/tags.svg" alt="" width="20" height="20" style="vertical-align:middle;margin-right:8px;" /> Жанры</span>
+            <small>Управление справочником жанров</small>
+        </a>
+        <a asp-action="Authors" class="admin-nav-item">
+            <span><img src="~/icons/People.svg" alt="" width="20" height="20" style="vertical-align:middle;margin-right:8px;" /> Авторы</span>
+            <small>Управление справочником авторов</small>
+        </a>
+        <a asp-action="Songs" class="admin-nav-item">
+            <span><img src="~/icons/Play.svg" alt="" width="20" height="20" style="vertical-align:middle;margin-right:8px;" /> Песни</span>
+            <small>Полный список всех треков</small>
+        </a>
+    </div>
+</div>

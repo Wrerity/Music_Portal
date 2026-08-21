@@ -1,0 +1,60 @@
+@model SongEditViewModel
+@{
+    ViewData["Title"] = "Редактировать песню";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h2 class="text-accent">Редактировать песню</h2>
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label text-dark-custom">Название</label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="AuthorIds" class="form-label text-dark-custom">Авторы</label>
+                <select asp-for="AuthorIds" asp-items="@(new MultiSelectList(Model.AllAuthors, "Id", "Name"))" class="form-select" multiple size="5"></select>
+                <span asp-validation-for="AuthorIds" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="NewAuthorName" class="form-label text-dark-custom">Новый автор (если нет в списке)</label>
+                <input asp-for="NewAuthorName" class="form-control" placeholder="Имя нового автора" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="GenreIds" class="form-label text-dark-custom">Жанры</label>
+                <select asp-for="GenreIds" asp-items="@(new MultiSelectList(Model.AllGenres, "Id", "Name"))" class="form-select" multiple size="5"></select>
+                <span asp-validation-for="GenreIds" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Duration" class="form-label text-dark-custom">Длительность (секунд)</label>
+                <input asp-for="Duration" class="form-control" type="number" min="0" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Lyrics" class="form-label text-dark-custom">Текст песни (необязательно)</label>
+                <textarea asp-for="Lyrics" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="Lyrics" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="AudioFile" class="form-label text-dark-custom">Заменить аудиофайл (оставьте пустым, чтобы не менять)</label>
+                <input asp-for="AudioFile" class="form-control" type="file" accept=".mp3,.wav" />
+            </div>
+
+            <button type="submit" class="btn btn-accent">Сохранить</button>
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-dark-custom ms-2">Отмена</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

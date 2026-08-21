@@ -1,0 +1,76 @@
+@using Music_portal.Utils
+@model AdminUserListViewModel
+@{
+    ViewData["Title"] = "Пользователи";
+}
+
+<div class="admin-header">
+    <h1 class="admin-title">Пользователи</h1>
+    <a asp-action="UserCreate" class="admin-btn admin-btn-primary">+ Добавить пользователя</a>
+</div>
+
+<form method="get" asp-action="Users" class="admin-search-form">
+    <input type="text" name="search" class="admin-input" value="@Model.Search" placeholder="Поиск по имени..." />
+    <button type="submit" class="admin-btn admin-btn-primary">Поиск</button>
+    <a asp-action="Users" class="admin-btn admin-btn-secondary">Сброс</a>
+</form>
+
+<div class="admin-table-wrapper">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Имя пользователя</th>
+                <th>Роль</th>
+                <th>Дата регистрации</th>
+                <th>Статус</th>
+                <th class="admin-th-actions">Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <td>@user.Id</td>
+                    <td>@user.Username</td>
+                    <td>@(user.Role == Constants.AdminRoleName ? "Администратор" : "Пользователь")</td>
+                    <td>@user.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>
+                        @if (user.IsApproved)
+                        {
+                            <span class="admin-badge admin-badge-active">Активен</span>
+                        }
+                        else
+                        {
+                            <span class="admin-badge admin-badge-pending">Ожидает</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="UserEdit" asp-route-id="@user.Id" class="admin-btn admin-btn-sm admin-btn-primary">Редактировать</a>
+                        @if (user.Role != Constants.AdminRoleName)
+                        {
+                            <form asp-action="UserDelete" asp-route-id="@user.Id" method="post" class="d-inline"
+                                  onsubmit="return confirm('Удалить пользователя @user.Username? Все его песни будут удалены.');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="admin-btn admin-btn-sm admin-btn-reject">Удалить</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav class="admin-pagination">
+        @for (int p = 1; p <= Model.TotalPages; p++)
+        {
+            <a class="admin-page @(p == Model.Page ? "active" : "")"
+               href="@Url.Action("Users", new { search = Model.Search, page = p })">@p</a>
+        }
+    </nav>
+}
+
+<a asp-action="Index" class="admin-btn admin-btn-secondary mt-3">← Назад</a>
