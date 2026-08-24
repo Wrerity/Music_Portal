@@ -1,10 +1,11 @@
 @model AdminSongEditViewModel
+@inject IStringLocalizer<SharedResource> Loc
 @{
-    ViewData["Title"] = "Редактирование песни";
+    ViewData["Title"] = Loc["Admin_EditSong_Title"];
 }
 
 <div class="admin-header">
-    <h1 class="admin-title">Редактирование песни</h1>
+    <h1 class="admin-title">@Loc["Admin_EditSong_Title"]</h1>
 </div>
 
 <form asp-action="SongEdit" method="post" enctype="multipart/form-data" class="admin-form">
@@ -19,53 +20,53 @@
     </div>
 
     <div class="admin-form-group">
-        <label asp-for="UserId" class="admin-label">Пользователь (загрузивший)</label>
+        <label asp-for="UserId" class="admin-label">@Loc["Field_User"]</label>
         <select asp-for="UserId" class="admin-input" asp-items="@(new SelectList(Model.AllUsers, "Id", "Username", Model.UserId))">
         </select>
     </div>
 
     <div class="admin-form-group">
-        <label class="admin-label">Авторы</label>
+        <label class="admin-label">@Loc["Field_Authors_Multiple"]</label>
         <select asp-for="AuthorIds" class="admin-input" multiple="multiple"
                 asp-items="@(new MultiSelectList(Model.AllAuthors, "Id", "Name", Model.AuthorIds))">
         </select>
-        <small class="admin-hint">Зажмите Ctrl для выбора нескольких</small>
+        <small class="admin-hint">@Loc["Field_HintCtrl"]</small>
     </div>
 
     <div class="admin-form-group">
-        <label asp-for="NewAuthorName" class="admin-label">Или добавьте нового автора</label>
-        <input asp-for="NewAuthorName" class="admin-input" placeholder="Имя нового автора" />
+        <label asp-for="NewAuthorName" class="admin-label">@Loc["Field_NewAuthor_Alt"]</label>
+        <input asp-for="NewAuthorName" class="admin-input" placeholder="@Loc["Field_NewAuthorPlaceholder"]" />
     </div>
 
     <div class="admin-form-group">
-        <label class="admin-label">Жанры</label>
+        <label class="admin-label">@Loc["Field_Genres_Multiple"]</label>
         <select asp-for="GenreIds" class="admin-input" multiple="multiple"
                 asp-items="@(new MultiSelectList(Model.AllGenres, "Id", "Name", Model.GenreIds))">
         </select>
-        <small class="admin-hint">Зажмите Ctrl для выбора нескольких</small>
+        <small class="admin-hint">@Loc["Field_HintCtrl"]</small>
     </div>
 
     <div class="admin-form-group">
-        <label asp-for="Duration" class="admin-label">Длительность (сек.)</label>
+        <label asp-for="Duration" class="admin-label">@Loc["Field_DurationShort"]</label>
         <input asp-for="Duration" class="admin-input" type="number" min="0" />
         <span asp-validation-for="Duration" class="admin-field-error"></span>
     </div>
 
     <div class="admin-form-group">
-        <label asp-for="Lyrics" class="admin-label">Текст</label>
+        <label asp-for="Lyrics" class="admin-label">@Loc["Field_Text"]</label>
         <textarea asp-for="Lyrics" class="admin-input" rows="5"></textarea>
         <span asp-validation-for="Lyrics" class="admin-field-error"></span>
     </div>
 
     <div class="admin-form-group">
-        <label asp-for="AudioFile" class="admin-label">Заменить аудиофайл (оставьте пустым, чтобы не менять)</label>
+        <label asp-for="AudioFile" class="admin-label">@Loc["Field_ReplaceAudio"]</label>
         <input asp-for="AudioFile" class="admin-input" type="file" accept=".mp3,.wav" />
         <span asp-validation-for="AudioFile" class="admin-field-error"></span>
     </div>
 
     <div class="admin-form-actions">
-        <button type="submit" class="admin-btn admin-btn-primary">Сохранить</button>
-        <a asp-action="Songs" class="admin-btn admin-btn-secondary">Отмена</a>
+        <button type="submit" class="admin-btn admin-btn-primary">@Loc["Button_Save"]</button>
+        <a asp-action="Songs" class="admin-btn admin-btn-secondary">@Loc["Button_Cancel"]</a>
     </div>
 </form>
 

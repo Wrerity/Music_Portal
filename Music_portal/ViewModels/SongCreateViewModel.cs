@@ -6,14 +6,14 @@ namespace Music_portal.ViewModels;
 
 public class SongCreateViewModel
 {
-    [Required(ErrorMessage = "Название обязательно")]
+    [Required(ErrorMessage = "Validation_Required_Title")]
     [MaxLength(200)]
     public string Title { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Выберите хотя бы одного автора")]
+    [Required(ErrorMessage = "Validation_Required_AuthorIds")]
     public List<int> AuthorIds { get; set; } = new();
 
-    [Required(ErrorMessage = "Выберите хотя бы один жанр")]
+    [Required(ErrorMessage = "Validation_Required_GenreIds")]
     public List<int> GenreIds { get; set; } = new();
 
     [MaxLength(2000)]
@@ -21,9 +21,9 @@ public class SongCreateViewModel
 
     public int Duration { get; set; }
 
-    [Required(ErrorMessage = "Загрузите аудиофайл")]
-    [AllowedFileExtensions(".mp3", ".wav", ErrorMessage = "Разрешены только файлы .mp3 и .wav")]
-    [MaxFileSize(20 * 1024 * 1024, ErrorMessage = "Максимальный размер файла — 20 МБ")]
+    [Required(ErrorMessage = "Validation_Required_AudioFile")]
+    [AllowedFileExtensions(".mp3", ".wav", ErrorMessage = "Validation_AllowedExtensions")]
+    [MaxFileSize(20 * 1024 * 1024, ErrorMessage = "Validation_MaxFileSize")]
     public IFormFile? AudioFile { get; set; }
 
     [MaxLength(200)]

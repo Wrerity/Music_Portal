@@ -1,15 +1,16 @@
 @model List<UserDto>
+@inject IStringLocalizer<SharedResource> Loc
 @{
-    ViewData["Title"] = "Заявки на регистрацию";
+    ViewData["Title"] = Loc["Admin_Requests_Title"];
 }
 
 <div class="admin-header">
-    <h1 class="admin-title">Заявки на регистрацию</h1>
+    <h1 class="admin-title">@Loc["Admin_Requests_Title"]</h1>
 </div>
 
 @if (Model.Count == 0)
 {
-    <div class="admin-empty">Нет новых заявок на регистрацию.</div>
+    <div class="admin-empty">@Loc["Admin_EmptyRequests"]</div>
 }
 else
 {
@@ -17,9 +18,9 @@ else
         <table class="admin-table">
             <thead>
                 <tr>
-                    <th>Имя пользователя</th>
-                    <th>Дата регистрации</th>
-                    <th class="admin-th-actions">Действия</th>
+                    <th>@Loc["Table_Username"]</th>
+                    <th>@Loc["Table_CreatedAt"]</th>
+                    <th class="admin-th-actions">@Loc["Table_Actions"]</th>
                 </tr>
             </thead>
             <tbody>
@@ -31,11 +32,11 @@ else
                         <td>
                             <form asp-action="Approve" asp-route-id="@user.Id" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="admin-btn admin-btn-approve">Принять</button>
+                                <button type="submit" class="admin-btn admin-btn-approve">@Loc["Button_Approve"]</button>
                             </form>
                             <form asp-action="Reject" asp-route-id="@user.Id" method="post" class="d-inline">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="admin-btn admin-btn-reject">Отклонить</button>
+                                <button type="submit" class="admin-btn admin-btn-reject">@Loc["Button_Reject"]</button>
                             </form>
                         </td>
                     </tr>
@@ -45,4 +46,4 @@ else
     </div>
 }
 
-<a asp-action="Index" class="admin-btn admin-btn-secondary mt-3">← Назад</a>
+<a asp-action="Index" class="admin-btn admin-btn-secondary mt-3">← @Loc["Button_Back"]</a>

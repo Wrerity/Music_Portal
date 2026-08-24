@@ -1,10 +1,11 @@
 @model AdminAuthorViewModel
+@inject IStringLocalizer<SharedResource> Loc
 @{
-    ViewData["Title"] = "Редактирование автора";
+    ViewData["Title"] = Loc["Admin_EditAuthor_Title"];
 }
 
 <div class="admin-header">
-    <h1 class="admin-title">Редактирование автора</h1>
+    <h1 class="admin-title">@Loc["Admin_EditAuthor_Title"]</h1>
 </div>
 
 <form asp-action="AuthorEdit" method="post" class="admin-form">
@@ -19,20 +20,20 @@
     </div>
 
     <div class="admin-form-group">
-        <label asp-for="Country" class="admin-label">Страна</label>
+        <label asp-for="Country" class="admin-label">@Loc["Field_Country"]</label>
         <input asp-for="Country" class="admin-input" />
         <span asp-validation-for="Country" class="admin-field-error"></span>
     </div>
 
     <div class="admin-form-group">
-        <label asp-for="Description" class="admin-label">Описание</label>
+        <label asp-for="Description" class="admin-label">@Loc["Field_Description"]</label>
         <textarea asp-for="Description" class="admin-input" rows="3"></textarea>
         <span asp-validation-for="Description" class="admin-field-error"></span>
     </div>
 
     <div class="admin-form-actions">
-        <button type="submit" class="admin-btn admin-btn-primary">Сохранить</button>
-        <a asp-action="Authors" class="admin-btn admin-btn-secondary">Отмена</a>
+        <button type="submit" class="admin-btn admin-btn-primary">@Loc["Button_Save"]</button>
+        <a asp-action="Authors" class="admin-btn admin-btn-secondary">@Loc["Button_Cancel"]</a>
     </div>
 </form>
 

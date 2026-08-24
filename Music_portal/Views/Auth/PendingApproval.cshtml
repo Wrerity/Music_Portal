@@ -1,12 +1,13 @@
+@inject IStringLocalizer<SharedResource> Loc
 @{
-    ViewData["Title"] = "Ожидание подтверждения";
+    ViewData["Title"] = Loc["Pending_Title"];
 }
 
 <div class="row justify-content-center">
     <div class="col-md-6 text-center">
-        <h2 class="text-accent">Регистрация выполнена</h2>
-        <p class="lead mt-3 text-dark-custom">Дождитесь подтверждения администратором.</p>
-        <p class="text-dark-custom">После активации учётной записи вы сможете войти в систему.</p>
-        <a asp-action="Login" class="btn btn-accent mt-3">На страницу входа</a>
+        <h2 class="text-accent">@Loc["Pending_Header"]</h2>
+        <p class="lead mt-3 text-dark-custom">@Loc["Pending_Text1"]</p>
+        <p class="text-dark-custom">@Loc["Pending_Text2"]</p>
+        <a asp-action="Login" class="btn btn-accent mt-3">@Loc["Pending_LoginButton"]</a>
     </div>
 </div>

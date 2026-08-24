@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <!-- Layout -->
+  <data name="AppTitle" xml:space="preserve"><value>Музыкальный портал</value></data>
+  <data name="Nav_Home" xml:space="preserve"><value>Главная</value></data>
+  <data name="Nav_AddSong" xml:space="preserve"><value>Добавить песню</value></data>
+  <data name="Nav_MySongs" xml:space="preserve"><value>Мои песни</value></data>
+  <data name="Nav_Admin" xml:space="preserve"><value>Администрирование</value></data>
+  <data name="Nav_Logout" xml:space="preserve"><value>Выход</value></data>
+  <data name="Nav_Register" xml:space="preserve"><value>Регистрация</value></data>
+  <data name="Nav_Login" xml:space="preserve"><value>Вход</value></data>
+  <data name="Language_Switch" xml:space="preserve"><value>Язык</value></data>
+  <!-- Home Index -->
+  <data name="Home_Title" xml:space="preserve"><value>Главная</value></data>
+  <data name="Home_Welcome" xml:space="preserve"><value>Добро пожаловать на Музыкальный портал</value></data>
+  <data name="Filter_Search" xml:space="preserve"><value>Поиск</value></data>
+  <data name="Filter_SearchPlaceholder" xml:space="preserve"><value>Название трека...</value></data>
+  <data name="Filter_Genres" xml:space="preserve"><value>Жанры</value></data>
+  <data name="Filter_AllGenres" xml:space="preserve"><value>Все жанры</value></data>
+  <data name="Filter_Sort" xml:space="preserve"><value>Сортировка</value></data>
+  <data name="Sort_New" xml:space="preserve"><value>Новые</value></data>
+  <data name="Sort_Popular" xml:space="preserve"><value>Популярные</value></data>
+  <data name="Sort_Title" xml:space="preserve"><value>По названию</value></data>
+  <data name="Filter_Apply" xml:space="preserve"><value>Применить</value></data>
+  <data name="Filter_Reset" xml:space="preserve"><value>Сброс</value></data>
+  <data name="Song_ListenTitle" xml:space="preserve"><value>Слушать</value></data>
+  <data name="Song_Listeners" xml:space="preserve"><value>слушателей</value></data>
+  <data name="Song_Download" xml:space="preserve"><value>Скачать</value></data>
+  <data name="Song_LoginToDownload" xml:space="preserve"><value>Войдите, чтобы скачать</value></data>
+  <!-- NotFound / AccessDenied -->
+  <data name="NotFound_Title" xml:space="preserve"><value>Страница не найдена</value></data>
+  <data name="NotFound_Header" xml:space="preserve"><value>Страница не найдена</value></data>
+  <data name="NotFound_Text" xml:space="preserve"><value>Запрашиваемая страница не существует или была удалена.</value></data>
+  <data name="AccessDenied_Title" xml:space="preserve"><value>Доступ запрещён</value></data>
+  <data name="AccessDenied_Header" xml:space="preserve"><value>Доступ запрещён</value></data>
+  <data name="AccessDenied_Text" xml:space="preserve"><value>У вас нет прав для просмотра этой страницы.</value></data>
+  <data name="Button_ToHome" xml:space="preserve"><value>На главную</value></data>
+  <!-- Auth -->
+  <data name="Login_Title" xml:space="preserve"><value>Вход</value></data>
+  <data name="Login_Header" xml:space="preserve"><value>Вход</value></data>
+  <data name="Register_Title" xml:space="preserve"><value>Регистрация</value></data>
+  <data name="Register_Header" xml:space="preserve"><value>Регистрация</value></data>
+  <data name="Field_Username" xml:space="preserve"><value>Имя пользователя</value></data>
+  <data name="Field_Password" xml:space="preserve"><value>Пароль</value></data>
+  <data name="Field_ConfirmPassword" xml:space="preserve"><value>Подтверждение пароля</value></data>
+  <data name="Login_Button" xml:space="preserve"><value>Войти</value></data>
+  <data name="Login_NoAccount" xml:space="preserve"><value>Нет аккаунта?</value></data>
+  <data name="Login_RegisterLink" xml:space="preserve"><value>Зарегистрироваться</value></data>
+  <data name="Register_Button" xml:space="preserve"><value>Зарегистрироваться</value></data>
+  <data name="Register_HasAccount" xml:space="preserve"><value>Уже зарегистрированы?</value></data>
+  <data name="Pending_Title" xml:space="preserve"><value>Ожидание подтверждения</value></data>
+  <data name="Pending_Header" xml:space="preserve"><value>Регистрация выполнена</value></data>
+  <data name="Pending_Text1" xml:space="preserve"><value>Дождитесь подтверждения администратором.</value></data>
+  <data name="Pending_Text2" xml:space="preserve"><value>После активации учётной записи вы сможете войти в систему.</value></data>
+  <data name="Pending_LoginButton" xml:space="preserve"><value>На страницу входа</value></data>
+  <!-- Song -->
+  <data name="Song_Create_Title" xml:space="preserve"><value>Добавить песню</value></data>
+  <data name="Song_Create_Header" xml:space="preserve"><value>Добавить песню</value></data>
+  <data name="Song_Edit_Title" xml:space="preserve"><value>Редактировать песню</value></data>
+  <data name="Song_Edit_Header" xml:space="preserve"><value>Редактировать песню</value></data>
+  <data name="Field_Title" xml:space="preserve"><value>Название</value></data>
+  <data name="Field_Authors" xml:space="preserve"><value>Авторы</value></data>
+  <data name="Field_NewAuthor" xml:space="preserve"><value>Новый автор (если нет в списке)</value></data>
+  <data name="Field_NewAuthorPlaceholder" xml:space="preserve"><value>Имя нового автора</value></data>
+  <data name="Field_Genres" xml:space="preserve"><value>Жанры</value></data>
+  <data name="Field_Duration" xml:space="preserve"><value>Длительность (секунд)</value></data>
+  <data name="Field_Lyrics" xml:space="preserve"><value>Текст песни (необязательно)</value></data>
+  <data name="Field_LyricsOptional" xml:space="preserve"><value>Текст песни</value></data>
+  <data name="Field_AudioFile" xml:space="preserve"><value>Аудиофайл (.mp3, .wav, до 20 МБ)</value></data>
+  <data name="Field_ReplaceAudio" xml:space="preserve"><value>Заменить аудиофайл (оставьте пустым, чтобы не менять)</value></data>
+  <data name="Button_Upload" xml:space="preserve"><value>Загрузить</value></data>
+  <data name="Button_Save" xml:space="preserve"><value>Сохранить</value></data>
+  <data name="Button_Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Song_MySongs_Title" xml:space="preserve"><value>Мои песни</value></data>
+  <data name="Song_MySongs_Header" xml:space="preserve"><value>Мои песни</value></data>
+  <data name="Song_MySongs_NoSongs" xml:space="preserve"><value>Вы ещё не загрузили ни одной песни.</value></data>
+  <data name="Button_AddSong" xml:space="preserve"><value>Добавить песню</value></data>
+  <data name="Table_Title" xml:space="preserve"><value>Название</value></data>
+  <data name="Table_Authors" xml:space="preserve"><value>Авторы</value></data>
+  <data name="Table_Genres" xml:space="preserve"><value>Жанры</value></data>
+  <data name="Table_Plays" xml:space="preserve"><value>Прослушивания</value></data>
+  <data name="Table_Actions" xml:space="preserve"><value>Действия</value></data>
+  <data name="Button_Edit" xml:space="preserve"><value>Редактировать</value></data>
+  <data name="Button_Delete" xml:space="preserve"><value>Удалить</value></data>
+  <data name="Confirm_DeleteSong" xml:space="preserve"><value>Удалить песню?</value></data>
+  <data name="Song_Details_Authors" xml:space="preserve"><value>Авторы:</value></data>
+  <data name="Song_Details_Genres" xml:space="preserve"><value>Жанры:</value></data>
+  <data name="Song_Details_Duration" xml:space="preserve"><value>Длительность:</value></data>
+  <data name="Song_Details_UploadDate" xml:space="preserve"><value>Дата загрузки:</value></data>
+  <data name="Song_Details_PlayCount" xml:space="preserve"><value>Прослушиваний:</value></data>
+  <data name="Song_Details_Lyrics" xml:space="preserve"><value>Текст песни:</value></data>
+  <!-- Admin -->
+  <data name="Admin_Title" xml:space="preserve"><value>Админ-панель</value></data>
+  <data name="Admin_Header" xml:space="preserve"><value>Панель управления</value></data>
+  <data name="Admin_Subtitle" xml:space="preserve"><value>Управление музыкальным порталом</value></data>
+  <data name="Admin_Users" xml:space="preserve"><value>Пользователи</value></data>
+  <data name="Admin_Requests" xml:space="preserve"><value>Заявки</value></data>
+  <data name="Admin_Songs" xml:space="preserve"><value>Песни</value></data>
+  <data name="Admin_Genres" xml:space="preserve"><value>Жанры</value></data>
+  <data name="Admin_Authors" xml:space="preserve"><value>Авторы</value></data>
+  <data name="Admin_ManageUsers" xml:space="preserve"><value>Управление учётными записями</value></data>
+  <data name="Admin_ManageGenres" xml:space="preserve"><value>Управление справочником жанров</value></data>
+  <data name="Admin_ManageAuthors" xml:space="preserve"><value>Управление справочником авторов</value></data>
+  <data name="Admin_AllSongs" xml:space="preserve"><value>Полный список всех треков</value></data>
+  <data name="Admin_Requests_Title" xml:space="preserve"><value>Заявки на регистрацию</value></data>
+  <data name="Admin_PendingCount" xml:space="preserve"><value>ожидающих подтверждения</value></data>
+  <data name="Admin_Genres_Title" xml:space="preserve"><value>Жанры</value></data>
+  <data name="Admin_Authors_Title" xml:space="preserve"><value>Авторы</value></data>
+  <data name="Button_AddGenre" xml:space="preserve"><value>Добавить жанр</value></data>
+  <data name="Button_AddAuthor" xml:space="preserve"><value>Добавить автора</value></data>
+  <data name="Button_AddUser" xml:space="preserve"><value>Добавить пользователя</value></data>
+  <data name="Button_Back" xml:space="preserve"><value>Назад</value></data>
+  <data name="Table_ID" xml:space="preserve"><value>ID</value></data>
+  <data name="Table_Name" xml:space="preserve"><value>Название</value></data>
+  <data name="Table_Description" xml:space="preserve"><value>Описание</value></data>
+  <data name="Table_Country" xml:space="preserve"><value>Страна</value></data>
+  <data name="Table_SongCount" xml:space="preserve"><value>Песен</value></data>
+  <data name="Table_Username" xml:space="preserve"><value>Имя пользователя</value></data>
+  <data name="Table_Role" xml:space="preserve"><value>Роль</value></data>
+  <data name="Table_CreatedAt" xml:space="preserve"><value>Дата регистрации</value></data>
+  <data name="Table_Status" xml:space="preserve"><value>Статус</value></data>
+  <data name="Status_Active" xml:space="preserve"><value>Активен</value></data>
+  <data name="Status_Pending" xml:space="preserve"><value>Ожидает</value></data>
+  <data name="Role_Admin" xml:space="preserve"><value>Администратор</value></data>
+  <data name="Role_User" xml:space="preserve"><value>Пользователь</value></data>
+  <data name="Field_Role" xml:space="preserve"><value>Роль</value></data>
+  <data name="Field_IsApproved" xml:space="preserve"><value>Активировать учётную запись</value></data>
+  <data name="Button_Create" xml:space="preserve"><value>Создать</value></data>
+  <data name="Button_Update" xml:space="preserve"><value>Обновить</value></data>
+  <data name="Placeholder_SearchUser" xml:space="preserve"><value>Поиск по имени...</value></data>
+  <data name="Button_Search" xml:space="preserve"><value>Поиск</value></data>
+  <!-- Validation -->
+  <data name="Validation_Required_Username" xml:space="preserve"><value>Имя пользователя обязательно</value></data>
+  <data name="Validation_Required_Password" xml:space="preserve"><value>Пароль обязателен</value></data>
+  <data name="Validation_Password_MinLength" xml:space="preserve"><value>Пароль должен быть не менее 6 символов</value></data>
+  <data name="Validation_Required_ConfirmPassword" xml:space="preserve"><value>Подтверждение пароля обязательно</value></data>
+  <data name="Validation_Passwords_NotMatch" xml:space="preserve"><value>Пароли не совпадают</value></data>
+  <data name="Validation_Required_Title" xml:space="preserve"><value>Название обязательно</value></data>
+  <data name="Validation_Required_AuthorIds" xml:space="preserve"><value>Выберите хотя бы одного автора</value></data>
+  <data name="Validation_Required_GenreIds" xml:space="preserve"><value>Выберите хотя бы один жанр</value></data>
+  <data name="Validation_Required_AudioFile" xml:space="preserve"><value>Загрузите аудиофайл</value></data>
+  <data name="Validation_Required_Name" xml:space="preserve"><value>Имя обязательно</value></data>
+  <data name="Validation_Required_Role" xml:space="preserve"><value>Роль обязательна</value></data>
+  <data name="Validation_AllowedExtensions" xml:space="preserve"><value>Разрешены только файлы .mp3 и .wav</value></data>
+  <data name="Validation_MaxFileSize" xml:space="preserve"><value>Максимальный размер файла — 20 МБ</value></data>
+  <data name="Validation_AudioRequired_Manual" xml:space="preserve"><value>Необходимо загрузить аудиофайл</value></data>
+  <!-- Messages -->
+  <data name="Msg_UserCreated" xml:space="preserve"><value>Пользователь создан</value></data>
+  <data name="Msg_UserUpdated" xml:space="preserve"><value>Пользователь обновлён</value></data>
+  <data name="Msg_UserDeleted" xml:space="preserve"><value>Пользователь удалён</value></data>
+  <data name="Msg_GenreCreated" xml:space="preserve"><value>Жанр создан</value></data>
+  <data name="Msg_GenreUpdated" xml:space="preserve"><value>Жанр обновлён</value></data>
+  <data name="Msg_GenreDeleted" xml:space="preserve"><value>Жанр удалён</value></data>
+  <data name="Msg_AuthorCreated" xml:space="preserve"><value>Автор создан</value></data>
+  <data name="Msg_AuthorUpdated" xml:space="preserve"><value>Автор обновлён</value></data>
+  <data name="Msg_AuthorDeleted" xml:space="preserve"><value>Автор удалён</value></data>
+  <data name="Msg_SongUpdated" xml:space="preserve"><value>Песня обновлена</value></data>
+  <data name="Msg_SongDeleted" xml:space="preserve"><value>Песня удалена</value></data>
+  <data name="Admin_CreateUser_Title" xml:space="preserve"><value>Создание пользователя</value></data>
+  <data name="Admin_EditUser_Title" xml:space="preserve"><value>Редактирование пользователя</value></data>
+  <data name="Admin_CreateGenre_Title" xml:space="preserve"><value>Создание жанра</value></data>
+  <data name="Admin_EditGenre_Title" xml:space="preserve"><value>Редактирование жанра</value></data>
+  <data name="Admin_CreateAuthor_Title" xml:space="preserve"><value>Создание автора</value></data>
+  <data name="Admin_EditAuthor_Title" xml:space="preserve"><value>Редактирование автора</value></data>
+  <data name="Admin_EditSong_Title" xml:space="preserve"><value>Редактирование песни</value></data>
+  <data name="Admin_AllSongs_Title" xml:space="preserve"><value>Все песни</value></data>
+  <data name="Admin_EmptyRequests" xml:space="preserve"><value>Нет новых заявок на регистрацию.</value></data>
+  <data name="Button_Approve" xml:space="preserve"><value>Принять</value></data>
+  <data name="Button_Reject" xml:space="preserve"><value>Отклонить</value></data>
+  <data name="Field_User" xml:space="preserve"><value>Пользователь (загрузивший)</value></data>
+  <data name="Field_Authors_Multiple" xml:space="preserve"><value>Авторы</value></data>
+  <data name="Field_Genres_Multiple" xml:space="preserve"><value>Жанры</value></data>
+  <data name="Field_HintCtrl" xml:space="preserve"><value>Зажмите Ctrl для выбора нескольких</value></data>
+  <data name="Field_NewAuthor_Alt" xml:space="preserve"><value>Или добавьте нового автора</value></data>
+  <data name="Field_DurationShort" xml:space="preserve"><value>Длительность (сек.)</value></data>
+  <data name="Field_Text" xml:space="preserve"><value>Текст</value></data>
+  <data name="Field_Country" xml:space="preserve"><value>Страна</value></data>
+  <data name="Field_Description" xml:space="preserve"><value>Описание</value></data>
+  <data name="Field_NewPasswordHint" xml:space="preserve"><value>Новый пароль (оставьте пустым, если не меняете)</value></data>
+  <data name="Table_UploadedBy" xml:space="preserve"><value>Загрузил</value></data>
+  <data name="Table_Date" xml:space="preserve"><value>Дата</value></data>
+  <data name="Table_PlaysShort" xml:space="preserve"><value>Прослушиваний</value></data>
+  <data name="Confirm_DeleteUser" xml:space="preserve"><value>Удалить пользователя {0}? Все его песни будут удалены.</value></data>
+  <data name="Confirm_DeleteGenre" xml:space="preserve"><value>Удалить жанр {0}?</value></data>
+  <data name="Confirm_DeleteAuthor" xml:space="preserve"><value>Удалить автора {0}?</value></data>
+  <data name="Confirm_DeleteSongAdmin" xml:space="preserve"><value>Удалить песню {0}? Файл будет удалён с сервера.</value></data>
+  <data name="Placeholder_SearchTitle" xml:space="preserve"><value>Поиск по названию...</value></data>
+  <data name="Admin_Empty" xml:space="preserve"><value>—</value></data>
+</root>

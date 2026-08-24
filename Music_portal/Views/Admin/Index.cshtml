@@ -1,12 +1,13 @@
 @model Music_portal.ViewModels.Admin.DashboardStats
+@inject IStringLocalizer<SharedResource> Loc
 @{
-    ViewData["Title"] = "Админ-панель";
+    ViewData["Title"] = Loc["Admin_Title"];
 }
 
 <div class="admin-page-layout">
     <div class="admin-header">
-        <h1 class="admin-title">Панель управления</h1>
-        <p class="admin-subtitle">Управление музыкальным порталом</p>
+        <h1 class="admin-title">@Loc["Admin_Header"]</h1>
+        <p class="admin-subtitle">@Loc["Admin_Subtitle"]</p>
     </div>
 
     <div class="admin-dashboard">
@@ -16,7 +17,7 @@
             </div>
             <div class="admin-card-body">
                 <div class="admin-card-number">@Model.TotalUsers</div>
-                <div class="admin-card-label">Пользователи</div>
+                <div class="admin-card-label">@Loc["Admin_Users"]</div>
             </div>
         </a>
         <a asp-action="PendingRequests" class="admin-card">
@@ -25,7 +26,7 @@
             </div>
             <div class="admin-card-body">
                 <div class="admin-card-number">@Model.PendingCount</div>
-                <div class="admin-card-label">Заявки</div>
+                <div class="admin-card-label">@Loc["Admin_Requests"]</div>
             </div>
         </a>
         <a asp-action="Songs" class="admin-card">
@@ -34,7 +35,7 @@
             </div>
             <div class="admin-card-body">
                 <div class="admin-card-number">@Model.TotalSongs</div>
-                <div class="admin-card-label">Песни</div>
+                <div class="admin-card-label">@Loc["Admin_Songs"]</div>
             </div>
         </a>
         <a asp-action="Genres" class="admin-card">
@@ -43,7 +44,7 @@
             </div>
             <div class="admin-card-body">
                 <div class="admin-card-number">@Model.TotalGenres</div>
-                <div class="admin-card-label">Жанры</div>
+                <div class="admin-card-label">@Loc["Admin_Genres"]</div>
             </div>
         </a>
         <a asp-action="Authors" class="admin-card">
@@ -52,31 +53,31 @@
             </div>
             <div class="admin-card-body">
                 <div class="admin-card-number">@Model.TotalAuthors</div>
-                <div class="admin-card-label">Авторы</div>
+                <div class="admin-card-label">@Loc["Admin_Authors"]</div>
             </div>
         </a>
     </div>
 
     <div class="admin-nav-list mt-4">
         <a asp-action="Users" class="admin-nav-item">
-            <span><img src="~/icons/People.svg" alt="" width="20" height="20" style="vertical-align:middle;margin-right:8px;" /> Пользователи</span>
-            <small>Управление учётными записями</small>
+            <span><img src="~/icons/People.svg" alt="" width="20" height="20" style="vertical-align:middle;margin-right:8px;" /> @Loc["Admin_Users"]</span>
+            <small>@Loc["Admin_ManageUsers"]</small>
         </a>
         <a asp-action="PendingRequests" class="admin-nav-item">
-            <span><img src="~/icons/request.svg" alt="" width="20" height="20" style="vertical-align:middle;margin-right:8px;" /> Заявки на регистрацию</span>
-            <small>@Model.PendingCount ожидающих подтверждения</small>
+            <span><img src="~/icons/request.svg" alt="" width="20" height="20" style="vertical-align:middle;margin-right:8px;" /> @Loc["Admin_Requests_Title"]</span>
+            <small>@Model.PendingCount @Loc["Admin_PendingCount"]</small>
         </a>
         <a asp-action="Genres" class="admin-nav-item">
-            <span><img src="~/icons/tags.svg" alt="" width="20" height="20" style="vertical-align:middle;margin-right:8px;" /> Жанры</span>
-            <small>Управление справочником жанров</small>
+            <span><img src="~/icons/tags.svg" alt="" width="20" height="20" style="vertical-align:middle;margin-right:8px;" /> @Loc["Admin_Genres"]</span>
+            <small>@Loc["Admin_ManageGenres"]</small>
         </a>
         <a asp-action="Authors" class="admin-nav-item">
-            <span><img src="~/icons/People.svg" alt="" width="20" height="20" style="vertical-align:middle;margin-right:8px;" /> Авторы</span>
-            <small>Управление справочником авторов</small>
+            <span><img src="~/icons/People.svg" alt="" width="20" height="20" style="vertical-align:middle;margin-right:8px;" /> @Loc["Admin_Authors"]</span>
+            <small>@Loc["Admin_ManageAuthors"]</small>
         </a>
         <a asp-action="Songs" class="admin-nav-item">
-            <span><img src="~/icons/Play.svg" alt="" width="20" height="20" style="vertical-align:middle;margin-right:8px;" /> Песни</span>
-            <small>Полный список всех треков</small>
+            <span><img src="~/icons/Play.svg" alt="" width="20" height="20" style="vertical-align:middle;margin-right:8px;" /> @Loc["Admin_Songs"]</span>
+            <small>@Loc["Admin_AllSongs"]</small>
         </a>
     </div>
 </div>

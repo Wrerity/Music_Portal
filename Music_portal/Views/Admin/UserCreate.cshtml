@@ -1,10 +1,11 @@
 @model AdminUserCreateViewModel
+@inject IStringLocalizer<SharedResource> Loc
 @{
-    ViewData["Title"] = "Создание пользователя";
+    ViewData["Title"] = Loc["Admin_CreateUser_Title"];
 }
 
 <div class="admin-header">
-    <h1 class="admin-title">Создание пользователя</h1>
+    <h1 class="admin-title">@Loc["Admin_CreateUser_Title"]</h1>
 </div>
 
 <form asp-action="UserCreate" method="post" class="admin-form">
@@ -25,20 +26,20 @@
     <div class="admin-form-group">
         <label asp-for="Role" class="admin-label"></label>
         <select asp-for="Role" class="admin-input">
-            <option value="User">Пользователь</option>
-            <option value="Admin">Администратор</option>
+            <option value="User">@Loc["Role_User"]</option>
+            <option value="Admin">@Loc["Role_Admin"]</option>
         </select>
         <span asp-validation-for="Role" class="admin-field-error"></span>
     </div>
 
     <div class="admin-form-group admin-form-check">
         <input asp-for="IsApproved" class="admin-checkbox" />
-        <label asp-for="IsApproved">Активировать учётную запись</label>
+        <label asp-for="IsApproved">@Loc["Field_IsApproved"]</label>
     </div>
 
     <div class="admin-form-actions">
-        <button type="submit" class="admin-btn admin-btn-primary">Создать</button>
-        <a asp-action="Users" class="admin-btn admin-btn-secondary">Отмена</a>
+        <button type="submit" class="admin-btn admin-btn-primary">@Loc["Button_Create"]</button>
+        <a asp-action="Users" class="admin-btn admin-btn-secondary">@Loc["Button_Cancel"]</a>
     </div>
 </form>
 

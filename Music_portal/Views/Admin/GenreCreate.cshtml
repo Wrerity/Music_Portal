@@ -1,10 +1,11 @@
 @model AdminGenreViewModel
+@inject IStringLocalizer<SharedResource> Loc
 @{
-    ViewData["Title"] = "Создание жанра";
+    ViewData["Title"] = Loc["Admin_CreateGenre_Title"];
 }
 
 <div class="admin-header">
-    <h1 class="admin-title">Создание жанра</h1>
+    <h1 class="admin-title">@Loc["Admin_CreateGenre_Title"]</h1>
 </div>
 
 <form asp-action="GenreCreate" method="post" class="admin-form">
@@ -23,8 +24,8 @@
     </div>
 
     <div class="admin-form-actions">
-        <button type="submit" class="admin-btn admin-btn-primary">Создать</button>
-        <a asp-action="Genres" class="admin-btn admin-btn-secondary">Отмена</a>
+        <button type="submit" class="admin-btn admin-btn-primary">@Loc["Button_Create"]</button>
+        <a asp-action="Genres" class="admin-btn admin-btn-secondary">@Loc["Button_Cancel"]</a>
     </div>
 </form>
 

@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Music.bisLog.Dtos;
 using Music.bisLog.Services;
+using Music_portal.Resources;
 using Music_portal.ViewModels;
 using Music_portal.ViewModels.Admin;
 
@@ -15,19 +17,22 @@ public class AdminController : Controller
     private readonly IAuthorService _authorService;
     private readonly ISongService _songService;
     private readonly ILogger<AdminController> _logger;
+    private readonly IStringLocalizer<SharedResource> _localizer;
 
     public AdminController(
         IUserService userService,
         IGenreService genreService,
         IAuthorService authorService,
         ISongService songService,
-        ILogger<AdminController> logger)
+        ILogger<AdminController> logger,
+        IStringLocalizer<SharedResource> localizer)
     {
         _userService = userService;
         _genreService = genreService;
         _authorService = authorService;
         _songService = songService;
         _logger = logger;
+        _localizer = localizer;
     }
 
     public async Task<IActionResult> Index()
@@ -82,7 +87,7 @@ public class AdminController : Controller
             return View(model);
         }
 
-        TempData["Success"] = "Пользователь создан";
+        TempData["Success"] = _localizer["Msg_UserCreated"];
         return RedirectToAction("Users");
     }
 
@@ -120,7 +125,7 @@ public class AdminController : Controller
             return View(model);
         }
 
-        TempData["Success"] = "Пользователь обновлён";
+        TempData["Success"] = _localizer["Msg_UserUpdated"];
         return RedirectToAction("Users");
     }
 
@@ -132,7 +137,7 @@ public class AdminController : Controller
         if (!result.Success)
             TempData["Error"] = result.Error;
         else
-            TempData["Success"] = "Пользователь удалён";
+            TempData["Success"] = _localizer["Msg_UserDeleted"];
         return RedirectToAction("Users");
     }
 
@@ -199,7 +204,7 @@ public class AdminController : Controller
             return View(model);
         }
 
-        TempData["Success"] = "Жанр создан";
+        TempData["Success"] = _localizer["Msg_GenreCreated"];
         return RedirectToAction("Genres");
     }
 
@@ -237,7 +242,7 @@ public class AdminController : Controller
             return View(model);
         }
 
-        TempData["Success"] = "Жанр обновлён";
+        TempData["Success"] = _localizer["Msg_GenreUpdated"];
         return RedirectToAction("Genres");
     }
 
@@ -246,7 +251,7 @@ public class AdminController : Controller
     public async Task<IActionResult> GenreDelete(int id)
     {
         await _genreService.DeleteAsync(id);
-        TempData["Success"] = "Жанр удалён";
+        TempData["Success"] = _localizer["Msg_GenreDeleted"];
         return RedirectToAction("Genres");
     }
 
@@ -291,7 +296,7 @@ public class AdminController : Controller
             return View(model);
         }
 
-        TempData["Success"] = "Автор создан";
+        TempData["Success"] = _localizer["Msg_AuthorCreated"];
         return RedirectToAction("Authors");
     }
 
@@ -331,7 +336,7 @@ public class AdminController : Controller
             return View(model);
         }
 
-        TempData["Success"] = "Автор обновлён";
+        TempData["Success"] = _localizer["Msg_AuthorUpdated"];
         return RedirectToAction("Authors");
     }
 
@@ -340,7 +345,7 @@ public class AdminController : Controller
     public async Task<IActionResult> AuthorDelete(int id)
     {
         await _authorService.DeleteAsync(id);
-        TempData["Success"] = "Автор удалён";
+        TempData["Success"] = _localizer["Msg_AuthorDeleted"];
         return RedirectToAction("Authors");
     }
 
@@ -434,7 +439,7 @@ public class AdminController : Controller
             return View(model);
         }
 
-        TempData["Success"] = "Песня обновлена";
+        TempData["Success"] = _localizer["Msg_SongUpdated"];
         return RedirectToAction("Songs");
     }
 
@@ -446,7 +451,7 @@ public class AdminController : Controller
         if (!result.Success)
             TempData["Error"] = result.Error;
         else
-            TempData["Success"] = "Песня удалена";
+            TempData["Success"] = _localizer["Msg_SongDeleted"];
         return RedirectToAction("Songs");
     }
 }

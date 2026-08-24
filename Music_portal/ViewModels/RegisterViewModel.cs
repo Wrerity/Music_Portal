@@ -4,17 +4,17 @@ namespace Music_portal.ViewModels;
 
 public class RegisterViewModel
 {
-    [Required(ErrorMessage = "Пароль обязателен")]
-    [MinLength(6, ErrorMessage = "Пароль должен быть не менее 6 символов")]
+    [Required(ErrorMessage = "Validation_Required_Password")]
+    [MinLength(6, ErrorMessage = "Validation_Password_MinLength")]
     [DataType(DataType.Password)]
     public string Password { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Подтверждение пароля обязательно")]
+    [Required(ErrorMessage = "Validation_Required_ConfirmPassword")]
     [DataType(DataType.Password)]
-    [Compare("Password", ErrorMessage = "Пароли не совпадают")]
+    [Compare("Password", ErrorMessage = "Validation_Passwords_NotMatch")]
     public string ConfirmPassword { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Имя пользователя обязательно")]
+    [Required(ErrorMessage = "Validation_Required_Username")]
     [MaxLength(100)]
     public string Username { get; set; } = string.Empty;
 }

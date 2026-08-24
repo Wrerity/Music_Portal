@@ -1,5 +1,6 @@
 @using Music_portal.Utils
 @model SongDetailViewModel
+@inject IStringLocalizer<SharedResource> Loc
 @{
     ViewData["Title"] = Model.Title;
     var isAuth = User.Identity?.IsAuthenticated == true;
@@ -14,30 +15,30 @@
             </div>
             <div class="card-body">
                 <div class="mb-3">
-                    <strong class="text-dark-custom">Авторы:</strong>
+                    <strong class="text-dark-custom">@Loc["Song_Details_Authors"]</strong>
                     <span>@string.Join(", ", Model.Authors)</span>
                 </div>
                 <div class="mb-3">
-                    <strong class="text-dark-custom">Жанры:</strong>
+                    <strong class="text-dark-custom">@Loc["Song_Details_Genres"]</strong>
                     <span>@string.Join(", ", Model.Genres)</span>
                 </div>
                 <div class="mb-3">
-                    <strong class="text-dark-custom">Длительность:</strong>
+                    <strong class="text-dark-custom">@Loc["Song_Details_Duration"]</strong>
                     <span>@Model.DurationFormatted</span>
                 </div>
                 <div class="mb-3">
-                    <strong class="text-dark-custom">Дата загрузки:</strong>
+                    <strong class="text-dark-custom">@Loc["Song_Details_UploadDate"]</strong>
                     <span>@Model.UploadDate.ToString("dd.MM.yyyy")</span>
                 </div>
                 <div class="mb-3">
-                    <strong class="text-dark-custom">Прослушиваний:</strong>
+                    <strong class="text-dark-custom">@Loc["Song_Details_PlayCount"]</strong>
                     <span>@Model.PlayCount</span>
                 </div>
 
                 @if (!string.IsNullOrEmpty(Model.Lyrics))
                 {
                     <div class="mb-3">
-                        <strong class="text-dark-custom">Текст песни:</strong>
+                        <strong class="text-dark-custom">@Loc["Song_Details_Lyrics"]</strong>
                         <pre class="mt-2 p-3 bg-custom-light border border-dark-custom rounded" style="white-space:pre-wrap;font-family:inherit;">@Model.Lyrics</pre>
                     </div>
                 }
@@ -45,24 +46,24 @@
                 @if (isAuth)
                 {
                     <a asp-action="Download" asp-route-id="@Model.Id" class="btn btn-accent btn-no-hover">
-                        <img src="~/icons/download.svg" alt="" width="16" height="16" style="filter:brightness(0) invert(1);vertical-align:middle;margin-right:4px;" /> Скачать
+                        <img src="~/icons/download.svg" alt="" width="16" height="16" style="filter:brightness(0) invert(1);vertical-align:middle;margin-right:4px;" /> @Loc["Song_Download"]
                     </a>
                 }
                 else
                 {
-                    <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-dark-custom btn-no-hover">Войдите, чтобы скачать</a>
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-dark-custom btn-no-hover">@Loc["Song_LoginToDownload"]</a>
                 }
 
                 @if (canEdit)
                 {
-                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-dark-custom ms-2 btn-no-hover">Редактировать</a>
-                    <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('Удалить песню?');">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-dark-custom ms-2 btn-no-hover">@Loc["Button_Edit"]</a>
+                    <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('@Loc["Confirm_DeleteSong"]');">
                         @Html.AntiForgeryToken()
-                        <button type="submit" class="btn btn-outline-dark-custom ms-2 btn-no-hover">Удалить</button>
+                        <button type="submit" class="btn btn-outline-dark-custom ms-2 btn-no-hover">@Loc["Button_Delete"]</button>
                     </form>
                 }
             </div>
         </div>
-        <a asp-action="Index" asp-controller="Home" class="btn btn-outline-dark-custom mt-3">На главную</a>
+        <a asp-action="Index" asp-controller="Home" class="btn btn-outline-dark-custom mt-3">@Loc["Button_ToHome"]</a>
     </div>
 </div>

@@ -1,11 +1,12 @@
 @model List<AdminGenreViewModel>
+@inject IStringLocalizer<SharedResource> Loc
 @{
-    ViewData["Title"] = "Жанры";
+    ViewData["Title"] = Loc["Admin_Genres_Title"];
 }
 
 <div class="admin-header">
-    <h1 class="admin-title">Жанры</h1>
-    <a asp-action="GenreCreate" class="admin-btn admin-btn-primary">+ Добавить жанр</a>
+    <h1 class="admin-title">@Loc["Admin_Genres_Title"]</h1>
+    <a asp-action="GenreCreate" class="admin-btn admin-btn-primary">+ @Loc["Button_AddGenre"]</a>
 </div>
 
 <div class="admin-table-wrapper">
@@ -13,10 +14,10 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Название</th>
-                <th>Описание</th>
-                <th>Песен</th>
-                <th class="admin-th-actions">Действия</th>
+                <th>@Loc["Table_Name"]</th>
+                <th>@Loc["Table_Description"]</th>
+                <th>@Loc["Table_SongCount"]</th>
+                <th class="admin-th-actions">@Loc["Table_Actions"]</th>
             </tr>
         </thead>
         <tbody>
@@ -28,11 +29,11 @@
                     <td>@(genre.Description ?? "—")</td>
                     <td>@genre.SongCount</td>
                     <td>
-                        <a asp-action="GenreEdit" asp-route-id="@genre.Id" class="admin-btn admin-btn-sm admin-btn-primary">Редактировать</a>
+                        <a asp-action="GenreEdit" asp-route-id="@genre.Id" class="admin-btn admin-btn-sm admin-btn-primary">@Loc["Button_Edit"]</a>
                         <form asp-action="GenreDelete" asp-route-id="@genre.Id" method="post" class="d-inline"
-                              onsubmit="return confirm('Удалить жанр @genre.Name?');">
+                              onsubmit="return confirm('@Loc["Confirm_DeleteGenre", genre.Name]');">
                             @Html.AntiForgeryToken()
-                            <button type="submit" class="admin-btn admin-btn-sm admin-btn-reject">Удалить</button>
+                            <button type="submit" class="admin-btn admin-btn-sm admin-btn-reject">@Loc["Button_Delete"]</button>
                         </form>
                     </td>
                 </tr>
@@ -41,4 +42,4 @@
     </table>
 </div>
 
-<a asp-action="Index" class="admin-btn admin-btn-secondary mt-3">← Назад</a>
+<a asp-action="Index" class="admin-btn admin-btn-secondary mt-3">← @Loc["Button_Back"]</a>

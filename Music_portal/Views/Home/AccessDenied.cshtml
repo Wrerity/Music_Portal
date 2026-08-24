@@ -1,10 +1,11 @@
+@inject IStringLocalizer<SharedResource> Loc
 @{
-    ViewData["Title"] = "Доступ запрещён";
+    ViewData["Title"] = Loc["AccessDenied_Title"];
 }
 
 <div class="text-center mt-5">
     <h1 class="display-1 text-accent">403</h1>
-    <h2 class="text-dark-custom">Доступ запрещён</h2>
-    <p class="text-muted">У вас нет прав для просмотра этой страницы.</p>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-accent btn-no-hover mt-3">На главную</a>
+    <h2 class="text-dark-custom">@Loc["AccessDenied_Header"]</h2>
+    <p class="text-muted">@Loc["AccessDenied_Text"]</p>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-accent btn-no-hover mt-3">@Loc["Button_ToHome"]</a>
 </div>

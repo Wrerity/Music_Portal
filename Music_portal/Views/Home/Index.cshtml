@@ -1,22 +1,23 @@
 ﻿@using Music_portal.Utils
 @model CatalogViewModel
+@inject IStringLocalizer<SharedResource> Loc
 @{
-    ViewData["Title"] = "Главная";
+    ViewData["Title"] = Loc["Home_Title"];
 }
 
 <div class="text-center mb-4">
-    <h1 class="display-4 text-accent">Добро пожаловать на Музыкальный портал</h1>
+    <h1 class="display-4 text-accent">@Loc["Home_Welcome"]</h1>
 </div>
 
 <form method="get" asp-action="Index" class="row g-2 mb-4 align-items-end">
     <div class="col-md-4">
-        <label class="form-label text-dark-custom">Поиск</label>
-        <input type="text" name="search" class="form-control" value="@Model.SearchTerm" placeholder="Название трека..." />
+        <label class="form-label text-dark-custom">@Loc["Filter_Search"]</label>
+        <input type="text" name="search" class="form-control" value="@Model.SearchTerm" placeholder="@Loc["Filter_SearchPlaceholder"]" />
     </div>
     <div class="col-md-2">
-        <label class="form-label text-dark-custom">Жанры</label>
+        <label class="form-label text-dark-custom">@Loc["Filter_Genres"]</label>
         <select name="genreIds" class="form-select">
-            <option value="">Все жанры</option>
+            <option value="">@Loc["Filter_AllGenres"]</option>
             @foreach (var g in Model.AllGenres)
             {
                 <option value="@g.Id" selected="@Model.SelectedGenreIds.Contains(g.Id)">@g.Name</option>
@@ -24,16 +25,16 @@
         </select>
     </div>
     <div class="col-md-2">
-        <label class="form-label text-dark-custom">Сортировка</label>
+        <label class="form-label text-dark-custom">@Loc["Filter_Sort"]</label>
         <select name="sortBy" class="form-select">
-            <option value="date" selected="@(Model.SortBy=="date")">Новые</option>
-            <option value="popularity" selected="@(Model.SortBy=="popularity")">Популярные</option>
-            <option value="title" selected="@(Model.SortBy=="title")">По названию</option>
+            <option value="date" selected="@(Model.SortBy=="date")">@Loc["Sort_New"]</option>
+            <option value="popularity" selected="@(Model.SortBy=="popularity")">@Loc["Sort_Popular"]</option>
+            <option value="title" selected="@(Model.SortBy=="title")">@Loc["Sort_Title"]</option>
         </select>
     </div>
     <div class="col-md-4 d-flex gap-1 align-items-end">
-        <button type="submit" class="btn btn-accent flex-fill">Применить</button>
-        <a asp-action="Index" class="btn btn-outline-dark-custom flex-fill">Сброс</a>
+        <button type="submit" class="btn btn-accent flex-fill">@Loc["Filter_Apply"]</button>
+        <a asp-action="Index" class="btn btn-outline-dark-custom flex-fill">@Loc["Filter_Reset"]</a>
     </div>
 </form>
 
@@ -44,24 +45,24 @@
             <div class="song-image">
                 <img src="~/icons/Play.svg" alt="Play" width="48" height="48" style="opacity:0.7;filter:brightness(0) invert(1);" />
             </div>
-            <button class="btn-play" title="Слушать" data-song-id="@song.Id">
+            <button class="btn-play" title="@Loc["Song_ListenTitle"]" data-song-id="@song.Id">
                 <img src="~/icons/Play.svg" class="play-icon" alt="Play" width="14" height="14" style="filter:brightness(0) invert(1);vertical-align:middle;" />
             </button>
             <div class="song-title"><a asp-controller="Song" asp-action="Details" asp-route-id="@song.Id">@song.Title</a></div>
-            <div class="song-listeners">@song.PlayCount слушателей</div>
+            <div class="song-listeners">@song.PlayCount @Loc["Song_Listeners"]</div>
             <div class="song-genres">@ViewHelper.TruncateGenres(song.Genres)</div>
             @if (User.Identity?.IsAuthenticated == true)
             {
                 <div class="song-download">
                     <a asp-controller="Song" asp-action="Download" asp-route-id="@song.Id" class="btn btn-dark-custom btn-sm w-100 rounded-0">
-                        <img src="~/icons/download.svg" alt="Download" width="12" height="12" style="filter:brightness(0) invert(1);vertical-align:middle;margin-right:4px;" /> Скачать
+                        <img src="~/icons/download.svg" alt="Download" width="12" height="12" style="filter:brightness(0) invert(1);vertical-align:middle;margin-right:4px;" /> @Loc["Song_Download"]
                     </a>
                 </div>
             }
             else
             {
                 <div class="song-download">
-                    <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-dark-custom btn-sm w-100 rounded-0">Войдите, чтобы скачать</a>
+                    <a asp-controller="Auth" asp-action="Login" class="btn btn-outline-dark-custom btn-sm w-100 rounded-0">@Loc["Song_LoginToDownload"]</a>
                 </div>
             }
             <div class="player-bar" style="display:none;">

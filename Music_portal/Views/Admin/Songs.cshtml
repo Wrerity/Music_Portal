@@ -1,16 +1,17 @@
 @model AdminSongListViewModel
+@inject IStringLocalizer<SharedResource> Loc
 @{
-    ViewData["Title"] = "Все песни";
+    ViewData["Title"] = Loc["Admin_AllSongs_Title"];
 }
 
 <div class="admin-header">
-    <h1 class="admin-title">Все песни</h1>
+    <h1 class="admin-title">@Loc["Admin_AllSongs_Title"]</h1>
 </div>
 
 <form method="get" asp-action="Songs" class="admin-search-form">
-    <input type="text" name="search" class="admin-input" value="@Model.Search" placeholder="Поиск по названию..." />
-    <button type="submit" class="admin-btn admin-btn-primary">Поиск</button>
-    <a asp-action="Songs" class="admin-btn admin-btn-secondary">Сброс</a>
+    <input type="text" name="search" class="admin-input" value="@Model.Search" placeholder="@Loc["Placeholder_SearchTitle"]" />
+    <button type="submit" class="admin-btn admin-btn-primary">@Loc["Button_Search"]</button>
+    <a asp-action="Songs" class="admin-btn admin-btn-secondary">@Loc["Filter_Reset"]</a>
 </form>
 
 <div class="admin-table-wrapper">
@@ -18,13 +19,13 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Название</th>
-                <th>Авторы</th>
-                <th>Жанры</th>
-                <th>Загрузил</th>
-                <th>Дата</th>
-                <th>Прослушиваний</th>
-                <th class="admin-th-actions">Действия</th>
+                <th>@Loc["Table_Title"]</th>
+                <th>@Loc["Table_Authors"]</th>
+                <th>@Loc["Table_Genres"]</th>
+                <th>@Loc["Table_UploadedBy"]</th>
+                <th>@Loc["Table_Date"]</th>
+                <th>@Loc["Table_PlaysShort"]</th>
+                <th class="admin-th-actions">@Loc["Table_Actions"]</th>
             </tr>
         </thead>
         <tbody>
@@ -39,11 +40,11 @@
                     <td>@song.UploadDate.ToString("dd.MM.yyyy")</td>
                     <td>@song.PlayCount</td>
                     <td>
-                        <a asp-action="SongEdit" asp-route-id="@song.Id" class="admin-btn admin-btn-sm admin-btn-primary">Редактировать</a>
+                        <a asp-action="SongEdit" asp-route-id="@song.Id" class="admin-btn admin-btn-sm admin-btn-primary">@Loc["Button_Edit"]</a>
                         <form asp-action="SongDelete" asp-route-id="@song.Id" method="post" class="d-inline"
-                              onsubmit="return confirm('Удалить песню @song.Title? Файл будет удалён с сервера.');">
+                              onsubmit="return confirm('@Loc["Confirm_DeleteSongAdmin", song.Title]');">
                             @Html.AntiForgeryToken()
-                            <button type="submit" class="admin-btn admin-btn-sm admin-btn-reject">Удалить</button>
+                            <button type="submit" class="admin-btn admin-btn-sm admin-btn-reject">@Loc["Button_Delete"]</button>
                         </form>
                     </td>
                 </tr>
@@ -63,4 +64,4 @@
     </nav>
 }
 
-<a asp-action="Index" class="admin-btn admin-btn-secondary mt-3">← Назад</a>
+<a asp-action="Index" class="admin-btn admin-btn-secondary mt-3">← @Loc["Button_Back"]</a>

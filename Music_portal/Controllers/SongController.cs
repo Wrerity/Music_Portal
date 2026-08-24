@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Music.bisLog.Dtos;
 using Music.bisLog.Services;
+using Music_portal.Resources;
 using Music_portal.Utils;
 using Music_portal.ViewModels;
 
@@ -12,12 +14,14 @@ public class SongController : Controller
     private readonly ISongService _songService;
     private readonly IGenreService _genreService;
     private readonly IAuthorService _authorService;
+    private readonly IStringLocalizer<SharedResource> _localizer;
 
-    public SongController(ISongService songService, IGenreService genreService, IAuthorService authorService)
+    public SongController(ISongService songService, IGenreService genreService, IAuthorService authorService, IStringLocalizer<SharedResource> localizer)
     {
         _songService = songService;
         _genreService = genreService;
         _authorService = authorService;
+        _localizer = localizer;
     }
 
     [HttpGet]
@@ -63,16 +67,16 @@ public class SongController : Controller
         model.AllGenres = await _genreService.GetAllLightAsync();
 
         if (model.AudioFile == null || model.AudioFile.Length == 0)
-            ModelState.AddModelError("", "Необходимо загрузить аудиофайл");
+            ModelState.AddModelError("", _localizer["Validation_AudioRequired_Manual"]);
 
         if (model.AudioFile != null)
         {
             var ext = Path.GetExtension(model.AudioFile.FileName).ToLowerInvariant();
             if (ext != ".mp3" && ext != ".wav")
-                ModelState.AddModelError("", "Разрешены только файлы .mp3 и .wav");
+                ModelState.AddModelError("", _localizer["Validation_AllowedExtensions"]);
 
             if (model.AudioFile.Length > 20 * 1024 * 1024)
-                ModelState.AddModelError("", "Максимальный размер файла — 20 МБ");
+                ModelState.AddModelError("", _localizer["Validation_MaxFileSize"]);
         }
 
         if (!ModelState.IsValid)
@@ -136,10 +140,10 @@ public class SongController : Controller
         {
             var ext = Path.GetExtension(model.AudioFile.FileName).ToLowerInvariant();
             if (ext != ".mp3" && ext != ".wav")
-                ModelState.AddModelError("", "Разрешены только файлы .mp3 и .wav");
+                ModelState.AddModelError("", _localizer["Validation_AllowedExtensions"]);
 
             if (model.AudioFile.Length > 20 * 1024 * 1024)
-                ModelState.AddModelError("", "Максимальный размер файла — 20 МБ");
+                ModelState.AddModelError("", _localizer["Validation_MaxFileSize"]);
         }
 
         if (!ModelState.IsValid)

@@ -1,18 +1,19 @@
 @using Music_portal.Utils
 @model AdminUserListViewModel
+@inject IStringLocalizer<SharedResource> Loc
 @{
-    ViewData["Title"] = "Пользователи";
+    ViewData["Title"] = Loc["Admin_Users"];
 }
 
 <div class="admin-header">
-    <h1 class="admin-title">Пользователи</h1>
-    <a asp-action="UserCreate" class="admin-btn admin-btn-primary">+ Добавить пользователя</a>
+    <h1 class="admin-title">@Loc["Admin_Users"]</h1>
+    <a asp-action="UserCreate" class="admin-btn admin-btn-primary">+ @Loc["Button_AddUser"]</a>
 </div>
 
 <form method="get" asp-action="Users" class="admin-search-form">
-    <input type="text" name="search" class="admin-input" value="@Model.Search" placeholder="Поиск по имени..." />
-    <button type="submit" class="admin-btn admin-btn-primary">Поиск</button>
-    <a asp-action="Users" class="admin-btn admin-btn-secondary">Сброс</a>
+    <input type="text" name="search" class="admin-input" value="@Model.Search" placeholder="@Loc["Placeholder_SearchUser"]" />
+    <button type="submit" class="admin-btn admin-btn-primary">@Loc["Button_Search"]</button>
+    <a asp-action="Users" class="admin-btn admin-btn-secondary">@Loc["Filter_Reset"]</a>
 </form>
 
 <div class="admin-table-wrapper">
@@ -20,11 +21,11 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Имя пользователя</th>
-                <th>Роль</th>
-                <th>Дата регистрации</th>
-                <th>Статус</th>
-                <th class="admin-th-actions">Действия</th>
+                <th>@Loc["Table_Username"]</th>
+                <th>@Loc["Table_Role"]</th>
+                <th>@Loc["Table_CreatedAt"]</th>
+                <th>@Loc["Table_Status"]</th>
+                <th class="admin-th-actions">@Loc["Table_Actions"]</th>
             </tr>
         </thead>
         <tbody>
@@ -33,26 +34,26 @@
                 <tr>
                     <td>@user.Id</td>
                     <td>@user.Username</td>
-                    <td>@(user.Role == Constants.AdminRoleName ? "Администратор" : "Пользователь")</td>
+                    <td>@(user.Role == Constants.AdminRoleName ? Loc["Role_Admin"] : Loc["Role_User"])</td>
                     <td>@user.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
                     <td>
                         @if (user.IsApproved)
                         {
-                            <span class="admin-badge admin-badge-active">Активен</span>
+                            <span class="admin-badge admin-badge-active">@Loc["Status_Active"]</span>
                         }
                         else
                         {
-                            <span class="admin-badge admin-badge-pending">Ожидает</span>
+                            <span class="admin-badge admin-badge-pending">@Loc["Status_Pending"]</span>
                         }
                     </td>
                     <td>
-                        <a asp-action="UserEdit" asp-route-id="@user.Id" class="admin-btn admin-btn-sm admin-btn-primary">Редактировать</a>
+                        <a asp-action="UserEdit" asp-route-id="@user.Id" class="admin-btn admin-btn-sm admin-btn-primary">@Loc["Button_Edit"]</a>
                         @if (user.Role != Constants.AdminRoleName)
                         {
                             <form asp-action="UserDelete" asp-route-id="@user.Id" method="post" class="d-inline"
-                                  onsubmit="return confirm('Удалить пользователя @user.Username? Все его песни будут удалены.');">
+                                  onsubmit="return confirm('@Loc["Confirm_DeleteUser", user.Username]');">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="admin-btn admin-btn-sm admin-btn-reject">Удалить</button>
+                                <button type="submit" class="admin-btn admin-btn-sm admin-btn-reject">@Loc["Button_Delete"]</button>
                             </form>
                         }
                     </td>
@@ -73,4 +74,4 @@
     </nav>
 }
 
-<a asp-action="Index" class="admin-btn admin-btn-secondary mt-3">← Назад</a>
+<a asp-action="Index" class="admin-btn admin-btn-secondary mt-3">← @Loc["Button_Back"]</a>
