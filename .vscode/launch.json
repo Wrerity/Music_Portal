@@ -1,0 +1,52 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Music.API (https 7090)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/Music.API/bin/Debug/net9.0/Music.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Music.API",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+        "uriFormat": "%s/swagger"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://localhost:7090;http://localhost:5090"
+      },
+      "sourceFileMap": {
+        "/Views": "${workspaceFolder}/Views"
+      }
+    },
+    {
+      "name": "Music_portal (https 7078)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/Music_portal/bin/Debug/net9.0/Music_portal.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/Music_portal",
+      "stopAtEntry": false,
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+      },
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNETCORE_URLS": "https://localhost:7078;http://localhost:5277"
+      }
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Portal + API (SPA + Web API)",
+      "configurations": ["Music.API (https 7090)", "Music_portal (https 7078)"],
+      "stopAll": true
+    }
+  ]
+}

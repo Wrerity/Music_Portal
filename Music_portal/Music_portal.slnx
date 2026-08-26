@@ -1,5 +1,7 @@
 <Solution>
   <Project Path="Music_portal.csproj" />
+  <Project Path="..\Music.API\Music.API.csproj" />
   <Project Path="..\Music.bisLog\Music.bisLog.csproj" />
   <Project Path="..\Music.DataAccess\Music.DataAccess.csproj" />
+  <Project Path="..\Music_portal.Tests\Music_portal.Tests.csproj" />
 </Solution>
