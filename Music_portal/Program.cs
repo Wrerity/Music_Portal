@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Music.DataAccess.Data;
 using Music.bisLog.Services;
+using Music_portal.Auth;
 using Music_portal.Filters;
 using Music_portal.Resources;
 
@@ -40,6 +41,9 @@ builder.Services.AddAuthorization();
 builder.Services.AddAutoMapper(typeof(Music.bisLog.MappingProfile));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+builder.Services.AddScoped<ITokenService, TokenService>();
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IGenreService, GenreService>();

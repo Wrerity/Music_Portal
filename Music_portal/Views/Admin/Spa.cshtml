@@ -1,0 +1,290 @@
+@inject IStringLocalizer<SharedResource> Loc
+@{
+    ViewData["Title"] = "Admin SPA";
+    var apiBase = (string)(ViewBag.ApiBase ?? "https://localhost:7090");
+    var token = (string)(ViewBag.Token ?? "");
+}
+
+<div class="admin-page-layout">
+    <div class="admin-header">
+        <h1 class="admin-title">Admin SPA <small style="font-size:0.5em;opacity:0.7">(AJAX + Web API)</small></h1>
+        <p class="admin-subtitle">@Loc["Admin_Subtitle"] — @Loc["Nav_Admin"] / SPA · REST: GET POST PUT DELETE</p>
+    </div>
+
+    <div id="spa-login" class="admin-form" style="display:none; max-width:500px;">
+        <h3>Вход в API (JWT)</h3>
+        <p class="text-muted">Токен не найден. Войдите через Web API <code>POST @apiBase/api/auth/login</code></p>
+        <div class="admin-form-group">
+            <label class="admin-label">@Loc["Field_Username"]</label>
+            <input id="login-username" class="admin-input" value="@ViewBag.Username" />
+        </div>
+        <div class="admin-form-group">
+            <label class="admin-label">@Loc["Field_Password"]</label>
+            <input id="login-password" class="admin-input" type="password" />
+        </div>
+        <button id="btn-login" class="admin-btn admin-btn-primary">Войти (POST)</button>
+        <span id="login-msg" class="text-danger"></span>
+    </div>
+
+    <div id="spa-app" style="display:none;">
+        <div class="api-bar mb-3 d-flex gap-2 align-items-center flex-wrap">
+            <span>API: <code id="api-base-label">@apiBase</code></span>
+            <span>Токен: <code id="token-label" style="max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;vertical-align:bottom;"></code></span>
+            <button id="btn-logout" class="admin-btn admin-btn-secondary btn-sm">Выйти</button>
+            <span id="api-status" class="admin-badge"></span>
+        </div>
+
+        <ul class="nav nav-pills mb-3" id="spa-tabs">
+            <li class="nav-item"><a class="nav-link active" data-tab="dashboard" href="#">Dashboard</a></li>
+            <li class="nav-item"><a class="nav-link" data-tab="users" href="#">@Loc["Admin_Users"]</a></li>
+            <li class="nav-item"><a class="nav-link" data-tab="pending" href="#">@Loc["Admin_Requests"]</a></li>
+            <li class="nav-item"><a class="nav-link" data-tab="genres" href="#">@Loc["Admin_Genres"]</a></li>
+            <li class="nav-item"><a class="nav-link" data-tab="authors" href="#">@Loc["Admin_Authors"]</a></li>
+            <li class="nav-item"><a class="nav-link" data-tab="songs" href="#">@Loc["Admin_Songs"] (@Loc["Admin_AllSongs"])</a></li>
+        </ul>
+
+        <!-- Dashboard -->
+        <section id="tab-dashboard" class="spa-tab">
+            <div class="admin-dashboard" id="dashboard-cards"></div>
+            <button class="admin-btn admin-btn-secondary mt-2" onclick="loadDashboard()">Обновить (GET)</button>
+        </section>
+
+        <!-- Users -->
+        <section id="tab-users" class="spa-tab" style="display:none">
+            <h3>@Loc["Admin_Users"] — REST: GET / POST / PUT / DELETE</h3>
+            <form id="users-search" class="admin-search-form" onsubmit="return false">
+                <input id="users-search-input" class="admin-input" placeholder="@Loc["Placeholder_SearchUser"]" />
+                <button type="button" class="admin-btn admin-btn-primary" onclick="loadUsers()">@Loc["Button_Search"] (GET)</button>
+                <button type="button" class="admin-btn admin-btn-secondary" onclick="document.getElementById('users-search-input').value='';loadUsers();">@Loc["Filter_Reset"]</button>
+            </form>
+            <div class="admin-table-wrapper"><table class="admin-table" id="users-table"><thead><tr><th>ID</th><th>@Loc["Table_Username"]</th><th>@Loc["Table_Role"]</th><th>@Loc["Table_CreatedAt"]</th><th>@Loc["Table_Status"]</th><th>@Loc["Table_Actions"]</th></tr></thead><tbody></tbody></table></div>
+            <div id="users-pagination" class="admin-pagination"></div>
+            <h4 class="mt-3">Создать / Редактировать (POST / PUT)</h4>
+            <form id="user-form" class="admin-form" onsubmit="return false">
+                <input type="hidden" id="user-id" />
+                <div class="admin-form-group"><label class="admin-label">@Loc["Field_Username"]</label><input id="user-username" class="admin-input" /></div>
+                <div class="admin-form-group"><label class="admin-label">@Loc["Field_Password"]</label><input id="user-password" class="admin-input" type="password" placeholder="@Loc["Field_NewPasswordHint"]" /></div>
+                <div class="admin-form-group"><label class="admin-label">@Loc["Field_Role"]</label><select id="user-role" class="admin-input"><option value="User">@Loc["Role_User"]</option><option value="Admin">@Loc["Role_Admin"]</option></select></div>
+                <div class="admin-form-group admin-form-check"><input id="user-approved" type="checkbox" class="admin-checkbox" checked /> <label for="user-approved">@Loc["Field_IsApproved"]</label></div>
+                <button type="button" class="admin-btn admin-btn-primary" onclick="saveUser()">@Loc["Button_Save"] (POST/PUT)</button>
+                <button type="button" class="admin-btn admin-btn-secondary" onclick="resetUserForm()">@Loc["Button_Cancel"]</button>
+            </form>
+        </section>
+
+        <!-- Pending -->
+        <section id="tab-pending" class="spa-tab" style="display:none">
+            <h3>@Loc["Admin_Requests_Title"] — GET / POST activate/reject</h3>
+            <button class="admin-btn admin-btn-secondary mb-2" onclick="loadPending()">Обновить (GET)</button>
+            <div class="admin-table-wrapper"><table class="admin-table" id="pending-table"><thead><tr><th>@Loc["Table_Username"]</th><th>@Loc["Table_CreatedAt"]</th><th>@Loc["Table_Actions"]</th></tr></thead><tbody></tbody></table></div>
+        </section>
+
+        <!-- Genres -->
+        <section id="tab-genres" class="spa-tab" style="display:none">
+            <h3>@Loc["Admin_Genres_Title"] — GET / POST / PUT / DELETE</h3>
+            <div class="admin-table-wrapper"><table class="admin-table" id="genres-table"><thead><tr><th>ID</th><th>@Loc["Table_Name"]</th><th>@Loc["Table_Description"]</th><th>@Loc["Table_SongCount"]</th><th>@Loc["Table_Actions"]</th></tr></thead><tbody></tbody></table></div>
+            <form id="genre-form" class="admin-form mt-3" onsubmit="return false">
+                <input type="hidden" id="genre-id" />
+                <div class="admin-form-group"><label class="admin-label">@Loc["Table_Name"]</label><input id="genre-name" class="admin-input" /></div>
+                <div class="admin-form-group"><label class="admin-label">@Loc["Field_Description"]</label><textarea id="genre-desc" class="admin-input" rows="2"></textarea></div>
+                <button type="button" class="admin-btn admin-btn-primary" onclick="saveGenre()">@Loc["Button_Save"]</button>
+                <button type="button" class="admin-btn admin-btn-secondary" onclick="resetGenreForm()">@Loc["Button_Cancel"]</button>
+            </form>
+        </section>
+
+        <!-- Authors -->
+        <section id="tab-authors" class="spa-tab" style="display:none">
+            <h3>@Loc["Admin_Authors_Title"] — GET / POST / PUT / DELETE</h3>
+            <div class="admin-table-wrapper"><table class="admin-table" id="authors-table"><thead><tr><th>ID</th><th>@Loc["Table_Name"]</th><th>@Loc["Table_Country"]</th><th>@Loc["Table_Description"]</th><th>@Loc["Table_SongCount"]</th><th>@Loc["Table_Actions"]</th></tr></thead><tbody></tbody></table></div>
+            <form id="author-form" class="admin-form mt-3" onsubmit="return false">
+                <input type="hidden" id="author-id" />
+                <div class="admin-form-group"><label class="admin-label">@Loc["Table_Name"]</label><input id="author-name" class="admin-input" /></div>
+                <div class="admin-form-group"><label class="admin-label">@Loc["Field_Country"]</label><input id="author-country" class="admin-input" /></div>
+                <div class="admin-form-group"><label class="admin-label">@Loc["Field_Description"]</label><textarea id="author-desc" class="admin-input" rows="2"></textarea></div>
+                <button type="button" class="admin-btn admin-btn-primary" onclick="saveAuthor()">@Loc["Button_Save"]</button>
+                <button type="button" class="admin-btn admin-btn-secondary" onclick="resetAuthorForm()">@Loc["Button_Cancel"]</button>
+            </form>
+        </section>
+
+        <!-- Songs -->
+        <section id="tab-songs" class="spa-tab" style="display:none">
+            <h3>@Loc["Admin_AllSongs_Title"] — GET / PUT (FormData) / DELETE</h3>
+            <form class="admin-search-form" onsubmit="return false">
+                <input id="songs-search" class="admin-input" placeholder="@Loc["Placeholder_SearchTitle"]" />
+                <button type="button" class="admin-btn admin-btn-primary" onclick="loadSongs()">@Loc["Button_Search"]</button>
+                <button type="button" class="admin-btn admin-btn-secondary" onclick="document.getElementById('songs-search').value='';loadSongs();">@Loc["Filter_Reset"]</button>
+            </form>
+            <div class="admin-table-wrapper"><table class="admin-table" id="songs-table"><thead><tr><th>ID</th><th>@Loc["Table_Title"]</th><th>@Loc["Table_Authors"]</th><th>@Loc["Table_Genres"]</th><th>@Loc["Table_UploadedBy"]</th><th>@Loc["Table_Date"]</th><th>@Loc["Table_PlaysShort"]</th><th>@Loc["Table_Actions"]</th></tr></thead><tbody></tbody></table></div>
+            <div id="songs-pagination" class="admin-pagination"></div>
+            <h4 class="mt-3">Редактировать песню (PUT multipart/form-data)</h4>
+            <form id="song-form" class="admin-form" onsubmit="return false">
+                <input type="hidden" id="song-id" />
+                <div class="admin-form-group"><label class="admin-label">@Loc["Field_Title"]</label><input id="song-title" class="admin-input" /></div>
+                <div class="admin-form-group"><label class="admin-label">@Loc["Field_User"] (ID)</label><input id="song-userId" class="admin-input" type="number" /></div>
+                <div class="admin-form-group"><label class="admin-label">@Loc["Field_Authors_Multiple"] (ID через запятую)</label><input id="song-authorIds" class="admin-input" placeholder="1,2" /></div>
+                <div class="admin-form-group"><label class="admin-label">@Loc["Field_Genres_Multiple"] (ID через запятую)</label><input id="song-genreIds" class="admin-input" placeholder="1,2" /></div>
+                <div class="admin-form-group"><label class="admin-label">@Loc["Field_Text"]</label><textarea id="song-lyrics" class="admin-input" rows="3"></textarea></div>
+                <div class="admin-form-group"><label class="admin-label">@Loc["Field_DurationShort"]</label><input id="song-duration" class="admin-input" type="number" /></div>
+                <div class="admin-form-group"><label class="admin-label">@Loc["Field_NewAuthor_Alt"]</label><input id="song-newAuthor" class="admin-input" /></div>
+                <div class="admin-form-group"><label class="admin-label">@Loc["Field_ReplaceAudio"]</label><input id="song-file" class="admin-input" type="file" accept=".mp3,.wav" /></div>
+                <button type="button" class="admin-btn admin-btn-primary" onclick="saveSong()">@Loc["Button_Save"] (PUT)</button>
+                <button type="button" class="admin-btn admin-btn-secondary" onclick="resetSongForm()">@Loc["Button_Cancel"]</button>
+            </form>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+const apiBase = '@apiBase';
+let token = '@token';
+if (token) localStorage.setItem('apiToken', token);
+else token = localStorage.getItem('apiToken') || '';
+
+const $ = s => document.querySelector(s);
+function setStatus(msg, ok=true){ const el=$('#api-status'); el.textContent=msg; el.className= ok ? 'admin-badge admin-badge-active' : 'admin-badge admin-badge-pending'; }
+function authHeaders(isJson=true){
+  const h={ 'Authorization': token ? 'Bearer '+token : '' };
+  if(isJson) h['Content-Type']='application/json';
+  return h;
+}
+async function apiFetch(method, path, body, isForm=false){
+  const opts={ method, headers: isForm ? { 'Authorization': token ? 'Bearer '+token : '' } : authHeaders(!isForm && body) };
+  if(body) opts.body = isForm ? body : JSON.stringify(body);
+  const res = await fetch(apiBase + path, opts);
+  const text = await res.text();
+  let data; try{ data = text ? JSON.parse(text) : null; } catch{ data=text}
+  if(!res.ok) throw {status:res.status, data};
+  return data;
+}
+
+// tabs
+document.querySelectorAll('#spa-tabs a').forEach(a=>{
+  a.addEventListener('click', e=>{
+    e.preventDefault();
+    document.querySelectorAll('#spa-tabs a').forEach(x=>x.classList.remove('active'));
+    a.classList.add('active');
+    document.querySelectorAll('.spa-tab').forEach(s=>s.style.display='none');
+    $('#tab-'+a.dataset.tab).style.display='block';
+    if(a.dataset.tab==='dashboard') loadDashboard();
+    if(a.dataset.tab==='users') loadUsers();
+    if(a.dataset.tab==='pending') loadPending();
+    if(a.dataset.tab==='genres') loadGenres();
+    if(a.dataset.tab==='authors') loadAuthors();
+    if(a.dataset.tab==='songs') loadSongs();
+  });
+});
+
+function init(){
+  if(!token){ $('#spa-login').style.display='block'; $('#spa-app').style.display='none'; }
+  else { $('#spa-login').style.display='none'; $('#spa-app').style.display='block'; $('#token-label').textContent=token.substring(0,40)+'...'; setStatus('JWT OK',true); loadDashboard(); }
+}
+$('#btn-login')?.addEventListener('click', async()=>{
+  const u=$('#login-username').value.trim(), p=$('#login-password').value;
+  try{
+    const data = await apiFetch('POST','/api/auth/login', {username:u,password:p});
+    token=data.token || data.Token; localStorage.setItem('apiToken', token); $('#login-msg').textContent=''; init();
+  }catch(e){ $('#login-msg').textContent= (e.data?.detail || e.data?.title || JSON.stringify(e.data)).substring(0,200); setStatus('Login fail',false); }
+});
+$('#btn-logout')?.addEventListener('click',()=>{ localStorage.removeItem('apiToken'); token=''; init(); });
+
+async function loadDashboard(){
+  try{
+    const [users, genres, authors] = await Promise.all([
+      apiFetch('GET','/api/users?page=1&pageSize=1'),
+      apiFetch('GET','/api/genres'),
+      apiFetch('GET','/api/authors')
+    ]);
+    const pending = await apiFetch('GET','/api/users/pending');
+    const songs = await apiFetch('GET','/api/admin/songs?page=1&pageSize=1');
+    const html = `
+      <div class="admin-card"><div class="admin-card-number">${users.totalCount ?? users.TotalCount ?? '-'}</div><div class="admin-card-label">@Loc["Admin_Users"]</div></div>
+      <div class="admin-card"><div class="admin-card-number">${pending.length ?? 0}</div><div class="admin-card-label">@Loc["Admin_Requests"]</div></div>
+      <div class="admin-card"><div class="admin-card-number">${songs.totalCount ?? songs.TotalCount ?? '-'}</div><div class="admin-card-label">@Loc["Admin_Songs"]</div></div>
+      <div class="admin-card"><div class="admin-card-number">${genres.length ?? 0}</div><div class="admin-card-label">@Loc["Admin_Genres"]</div></div>
+      <div class="admin-card"><div class="admin-card-number">${authors.length ?? 0}</div><div class="admin-card-label">@Loc["Admin_Authors"]</div></div>`;
+    $('#dashboard-cards').innerHTML=html; setStatus('Dashboard GET OK',true);
+  }catch(e){ setStatus('Dashboard error: '+e.status,false); console.error(e); }
+}
+
+// Users
+let usersPage=1;
+async function loadUsers(page=1){
+  usersPage=page;
+  const q=$('#users-search-input').value.trim();
+  try{
+    const data= await apiFetch('GET', `/api/users?search=${encodeURIComponent(q)}&page=${page}&pageSize=20`);
+    const rows=(data.users ?? data.Users ?? data ?? []).map(u=>`
+      <tr><td>${u.id ?? u.Id}</td><td>${u.username ?? u.Username}</td><td>${u.role ?? u.Role}</td><td>${(u.createdAt ?? u.CreatedAt ?? '').toString().substring(0,16)}</td>
+      <td>${(u.isApproved ?? u.IsApproved) ? '@Loc["Status_Active"]' : '@Loc["Status_Pending"]'}</td>
+      <td><button class="admin-btn admin-btn-sm admin-btn-primary" onclick="editUser(${u.id ?? u.Id})">@Loc["Button_Edit"]</button>
+      <button class="admin-btn admin-btn-sm admin-btn-reject" onclick="deleteUser(${u.id ?? u.Id})">@Loc["Button_Delete"] (DELETE)</button></td></tr>`).join('');
+    $('#users-table tbody').innerHTML=rows || '<tr><td colspan=6>—</td></tr>';
+    const totalPages=data.totalPages ?? data.TotalPages ?? 1;
+    let pg=''; for(let p=1;p<=totalPages;p++) pg+=`<a class="admin-page ${p===page?'active':''}" href="#" onclick="loadUsers(${p});return false;">${p}</a>`;
+    $('#users-pagination').innerHTML=pg; setStatus('Users GET OK',true);
+  }catch(e){ setStatus('Users GET '+e.status,false); }
+}
+async function editUser(id){
+  try{ const u= await apiFetch('GET', `/api/users/${id}`); $('#user-id').value=u.id ?? u.Id; $('#user-username').value=u.username ?? u.Username; $('#user-role').value=u.role ?? u.Role; $('#user-approved').checked=u.isApproved ?? u.IsApproved; $('#user-password').value=''; }catch(e){ alert('GET error '+e.status); }
+}
+async function saveUser(){
+  const id=$('#user-id').value.trim(); const dto={ username:$('#user-username').value.trim(), password:$('#user-password').value, role:$('#user-role').value, isApproved:$('#user-approved').checked };
+  try{ if(!id){ await apiFetch('POST','/api/users', dto); } else { if(!dto.password) delete dto.password; await apiFetch('PUT',`/api/users/${id}`, {...dto, id:parseInt(id)}); } setStatus(dto.username+' POST/PUT OK',true); resetUserForm(); loadUsers(usersPage); }catch(e){ alert('Save error: '+ JSON.stringify(e.data)); setStatus('Save fail',false); }
+}
+async function deleteUser(id){ if(!confirm('DELETE '+id+'?')) return; try{ await apiFetch('DELETE',`/api/users/${id}`); loadUsers(usersPage); }catch(e){ alert('DELETE '+e.status); } }
+function resetUserForm(){ $('#user-id').value=''; $('#user-username').value=''; $('#user-password').value=''; $('#user-role').value='User'; $('#user-approved').checked=true; }
+
+// Pending
+async function loadPending(){
+  try{ const arr= await apiFetch('GET','/api/users/pending'); const rows=arr.map(u=>`<tr><td>${u.username ?? u.Username}</td><td>${(u.createdAt ?? u.CreatedAt)}</td><td><button class="admin-btn admin-btn-approve" onclick="approveUser(${u.id ?? u.Id})">@Loc["Button_Approve"] (POST)</button> <button class="admin-btn admin-btn-reject" onclick="rejectUser(${u.id ?? u.Id})">@Loc["Button_Reject"]</button></td></tr>`).join(''); $('#pending-table tbody').innerHTML=rows || '<tr><td colspan=3>@Loc["Admin_EmptyRequests"]</td></tr>'; setStatus('Pending GET OK',true);}catch(e){ setStatus('Pending '+e.status,false);}
+}
+async function approveUser(id){ await apiFetch('POST',`/api/users/${id}/activate`, {}); loadPending(); loadDashboard(); }
+async function rejectUser(id){ await apiFetch('POST',`/api/users/${id}/reject`, {}); loadPending(); }
+
+// Genres
+async function loadGenres(){
+  try{ const arr= await apiFetch('GET','/api/genres'); const rows=arr.map(g=>`<tr><td>${g.id ?? g.Id}</td><td>${g.name ?? g.Name}</td><td>${g.description ?? g.Description ?? ''}</td><td>${g.songCount ?? g.SongCount ?? 0}</td><td><button class="admin-btn admin-btn-sm admin-btn-primary" onclick="editGenre(${g.id ?? g.Id})">@Loc["Button_Edit"]</button> <button class="admin-btn admin-btn-sm admin-btn-reject" onclick="deleteGenre(${g.id ?? g.Id})">@Loc["Button_Delete"]</button></td></tr>`).join(''); $('#genres-table tbody').innerHTML=rows; setStatus('Genres GET OK',true);}catch(e){ setStatus('Genres '+e.status,false);}
+}
+async function editGenre(id){ const g= await apiFetch('GET',`/api/genres/${id}`); $('#genre-id').value=g.id ?? g.Id; $('#genre-name').value=g.name ?? g.Name; $('#genre-desc').value=g.description ?? g.Description ?? ''; }
+async function saveGenre(){ const id=$('#genre-id').value.trim(); const dto={ name:$('#genre-name').value.trim(), description:$('#genre-desc').value }; try{ if(!id) await apiFetch('POST','/api/genres', dto); else await apiFetch('PUT',`/api/genres/${id}`, dto); resetGenreForm(); loadGenres(); }catch(e){ alert(JSON.stringify(e.data)); } }
+async function deleteGenre(id){ if(!confirm('DELETE genre '+id)) return; await apiFetch('DELETE',`/api/genres/${id}`); loadGenres(); }
+function resetGenreForm(){ $('#genre-id').value=''; $('#genre-name').value=''; $('#genre-desc').value=''; }
+
+// Authors
+async function loadAuthors(){
+  try{ const arr= await apiFetch('GET','/api/authors'); const rows=arr.map(a=>`<tr><td>${a.id ?? a.Id}</td><td>${a.name ?? a.Name}</td><td>${a.country ?? a.Country ?? ''}</td><td>${a.description ?? a.Description ?? ''}</td><td>${a.songCount ?? a.SongCount ?? 0}</td><td><button class="admin-btn admin-btn-sm admin-btn-primary" onclick="editAuthor(${a.id ?? a.Id})">@Loc["Button_Edit"]</button> <button class="admin-btn admin-btn-sm admin-btn-reject" onclick="deleteAuthor(${a.id ?? a.Id})">@Loc["Button_Delete"]</button></td></tr>`).join(''); $('#authors-table tbody').innerHTML=rows; setStatus('Authors GET OK',true);}catch(e){ setStatus('Authors '+e.status,false);}
+}
+async function editAuthor(id){ const a= await apiFetch('GET',`/api/authors/${id}`); $('#author-id').value=a.id ?? a.Id; $('#author-name').value=a.name ?? a.Name; $('#author-country').value=a.country ?? a.Country ?? ''; $('#author-desc').value=a.description ?? a.Description ?? ''; }
+async function saveAuthor(){ const id=$('#author-id').value.trim(); const dto={ name:$('#author-name').value.trim(), country:$('#author-country').value, description:$('#author-desc').value }; try{ if(!id) await apiFetch('POST','/api/authors', dto); else await apiFetch('PUT',`/api/authors/${id}`, dto); resetAuthorForm(); loadAuthors(); }catch(e){ alert(JSON.stringify(e.data)); } }
+async function deleteAuthor(id){ if(!confirm('DELETE author '+id)) return; await apiFetch('DELETE',`/api/authors/${id}`); loadAuthors(); }
+function resetAuthorForm(){ $('#author-id').value=''; $('#author-name').value=''; $('#author-country').value=''; $('#author-desc').value=''; }
+
+// Songs (admin)
+let songsPage=1;
+async function loadSongs(page=1){
+  songsPage=page; const q=$('#songs-search').value.trim();
+  try{ const data= await apiFetch('GET', `/api/admin/songs?search=${encodeURIComponent(q)}&page=${page}&pageSize=20`); const list=data.songs ?? data.Songs ?? []; const rows=list.map(s=>`<tr><td>${s.id ?? s.Id}</td><td>${s.title ?? s.Title}</td><td>${s.authors ?? s.Authors}</td><td>${s.genres ?? s.Genres}</td><td>${s.uploadedBy ?? s.UploadedBy}</td><td>${(s.uploadDate ?? s.UploadDate ?? '').toString().substring(0,10)}</td><td>${s.playCount ?? s.PlayCount}</td><td><button class="admin-btn admin-btn-sm admin-btn-primary" onclick="editSong(${s.id ?? s.Id})">@Loc["Button_Edit"]</button> <button class="admin-btn admin-btn-sm admin-btn-reject" onclick="deleteSong(${s.id ?? s.Id})">@Loc["Button_Delete"]</button></td></tr>`).join(''); $('#songs-table tbody').innerHTML=rows || '<tr><td colspan=8>—</td></tr>'; const tp=data.totalPages ?? data.TotalPages ??1; let pg=''; for(let p=1;p<=tp;p++) pg+=`<a class="admin-page ${p===page?'active':''}" href="#" onclick="loadSongs(${p});return false;">${p}</a>`; $('#songs-pagination').innerHTML=pg; setStatus('Songs GET OK',true);}catch(e){ setStatus('Songs '+e.status,false); }
+}
+async function editSong(id){
+  try{ const d= await apiFetch('GET',`/api/admin/songs/${id}`); $('#song-id').value=d.id ?? d.Id; $('#song-title').value=d.title ?? d.Title; $('#song-userId').value=d.userId ?? d.UserId; $('#song-authorIds').value=(d.authorIds ?? d.AuthorIds ?? []).join(','); $('#song-genreIds').value=(d.genreIds ?? d.GenreIds ?? []).join(','); $('#song-lyrics').value=d.lyrics ?? d.Lyrics ?? ''; $('#song-duration').value=d.duration ?? d.Duration ?? 0; }catch(e){ alert('GET song '+e.status); }
+}
+async function saveSong(){
+  const id=$('#song-id').value.trim(); if(!id) return alert('Выберите песню для редактирования');
+  const fd=new FormData();
+  fd.append('Title',$('#song-title').value.trim());
+  fd.append('UserId',$('#song-userId').value);
+  fd.append('Lyrics',$('#song-lyrics').value);
+  fd.append('Duration',$('#song-duration').value);
+  fd.append('NewAuthorName',$('#song-newAuthor').value);
+  const aids=$('#song-authorIds').value.split(',').map(s=>s.trim()).filter(Boolean); aids.forEach(v=>fd.append('AuthorIds',v));
+  const gids=$('#song-genreIds').value.split(',').map(s=>s.trim()).filter(Boolean); gids.forEach(v=>fd.append('GenreIds',v));
+  const f=$('#song-file').files[0]; if(f) fd.append('AudioFile',f);
+  try{ await apiFetch('PUT',`/api/admin/songs/${id}`, fd, true); setStatus('Song PUT OK',true); loadSongs(songsPage); }catch(e){ alert('PUT song: '+JSON.stringify(e.data)); }
+}
+async function deleteSong(id){ if(!confirm('DELETE song '+id)) return; await apiFetch('DELETE',`/api/admin/songs/${id}`); loadSongs(songsPage); }
+function resetSongForm(){ ['song-id','song-title','song-userId','song-authorIds','song-genreIds','song-lyrics','song-duration','song-newAuthor'].forEach(id=>$('#'+id).value=''); $('#song-file').value=''; }
+
+init();
+</script>
+}
+

@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Music.bisLog.Dtos;
 using Music.bisLog.Services;
+using Music_portal.Auth;
 using Music_portal.Resources;
+using Music_portal.Utils;
 using Music_portal.ViewModels;
 using Music_portal.ViewModels.Admin;
 
@@ -18,6 +20,8 @@ public class AdminController : Controller
     private readonly ISongService _songService;
     private readonly ILogger<AdminController> _logger;
     private readonly IStringLocalizer<SharedResource> _localizer;
+    private readonly ITokenService _tokenService;
+    private readonly IConfiguration _config;
 
     public AdminController(
         IUserService userService,
@@ -25,7 +29,9 @@ public class AdminController : Controller
         IAuthorService authorService,
         ISongService songService,
         ILogger<AdminController> logger,
-        IStringLocalizer<SharedResource> localizer)
+        IStringLocalizer<SharedResource> localizer,
+        ITokenService tokenService,
+        IConfiguration config)
     {
         _userService = userService;
         _genreService = genreService;
@@ -33,6 +39,24 @@ public class AdminController : Controller
         _songService = songService;
         _logger = logger;
         _localizer = localizer;
+        _tokenService = tokenService;
+        _config = config;
+    }
+
+    // === SPA (AJAX + Web API) ===
+    public async Task<IActionResult> Spa()
+    {
+        // Генерируем JWT для текущего админа, чтобы SPA могла вызывать Music.API без отдельного логина
+        var userId = User.GetUserId();
+        var userDto = await _userService.GetUserAsync(userId);
+        string token = "";
+        if (userDto != null)
+            token = _tokenService.CreateToken(userDto).Token;
+
+        ViewBag.ApiBase = _config["ApiBase"] ?? "https://localhost:7090";
+        ViewBag.Token = token;
+        ViewBag.Username = User.GetUsername();
+        return View();
     }
 
     public async Task<IActionResult> Index()
