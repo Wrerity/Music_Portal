@@ -18,14 +18,16 @@ public class HomeController : Controller
         _songService = songService;
     }
 
-    public async Task<IActionResult> Index(string? search, List<int>? genreIds, string sortBy = "date", int page = 1)
+    public async Task<IActionResult> Index(string? search, List<int>? genreIds, List<int>? authorIds, string sortBy = "date", int page = 1)
     {
-        var catalog = await _songService.GetCatalogAsync(search, genreIds, sortBy, page);
+        // Модель: сортировка / фильтрация / пагинация через EF в SongService.GetCatalogAsync
+        var catalog = await _songService.GetCatalogAsync(search, genreIds, authorIds, sortBy, page);
 
         var model = new CatalogViewModel
         {
             SearchTerm = catalog.SearchTerm,
             SelectedGenreIds = catalog.SelectedGenreIds,
+            SelectedAuthorIds = catalog.SelectedAuthorIds,
             SortBy = catalog.SortBy,
             Page = catalog.Page,
             TotalCount = catalog.TotalCount,
@@ -41,7 +43,8 @@ public class HomeController : Controller
                 PlayCount = s.PlayCount,
                 UploadedBy = s.UploadedBy
             }).ToList(),
-            AllGenres = catalog.AllGenres
+            AllGenres = catalog.AllGenres,
+            AllAuthors = catalog.AllAuthors
         };
 
         return View(model);

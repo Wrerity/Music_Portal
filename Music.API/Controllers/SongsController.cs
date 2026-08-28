@@ -21,13 +21,15 @@ public class SongsController : ApiControllerBase
     public async Task<IActionResult> GetCatalog(
         [FromQuery] string? search,
         [FromQuery] List<int>? genreIds,
+        [FromQuery] List<int>? authorIds,
         [FromQuery] string sortBy = SongSortKeys.Date,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 15)
     {
         if (page < 1) page = 1;
 
-        var catalog = await _songService.GetCatalogAsync(search, genreIds, sortBy, page);
+        // Модель: EF-фильтрация по жанру и исполнителю + сортировка + пагинация (Skip/Take в репозитории)
+        var catalog = await _songService.GetCatalogAsync(search, genreIds, authorIds, sortBy, page);
         return Ok(catalog);
     }
 

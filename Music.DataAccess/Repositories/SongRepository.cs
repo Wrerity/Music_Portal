@@ -9,7 +9,7 @@ public class SongRepository : Repository<Song>, ISongRepository
 {
     public SongRepository(AppDbContext db) : base(db) { }
 
-    public async Task<PagedResult<Song>> GetFilteredAsync(string? search, List<int>? genreIds, string sortBy, int page, int pageSize)
+    public async Task<PagedResult<Song>> GetFilteredAsync(string? search, List<int>? genreIds, List<int>? authorIds, string sortBy, int page, int pageSize)
     {
         var query = _db.Songs
             .Include(s => s.User)
@@ -17,12 +17,19 @@ public class SongRepository : Repository<Song>, ISongRepository
             .Include(s => s.Authors)
             .AsQueryable();
 
+        // Модель: фильтрация через EF — IQueryable (фильтрация на стороне БД)
         if (!string.IsNullOrWhiteSpace(search))
             query = query.Where(s => s.Title.Contains(search));
 
+        // Фильтрация по жанру (через связь Many-to-Many)
         if (genreIds != null && genreIds.Count != 0)
             query = query.Where(s => s.Genres.Any(g => genreIds.Contains(g.Id)));
 
+        // Фильтрация по исполнителю (автору)
+        if (authorIds != null && authorIds.Count != 0)
+            query = query.Where(s => s.Authors.Any(a => authorIds.Contains(a.Id)));
+
+        // Модель: сортировка через EF — OrderBy на IQueryable
         query = sortBy switch
         {
             SongSortKeys.Title => query.OrderBy(s => s.Title),

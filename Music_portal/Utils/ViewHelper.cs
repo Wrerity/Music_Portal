@@ -15,4 +15,15 @@ public static class ViewHelper
         if (ids.Count == 0) return "";
         return "&" + string.Join("&", ids.Select(id => $"genreIds={id}"));
     }
+
+    public static string AuthorQuery(List<int> ids)
+    {
+        if (ids.Count == 0) return "";
+        return "&" + string.Join("&", ids.Select(id => $"authorIds={id}"));
+    }
+
+    public static string FilterQuery(List<int> genreIds, List<int> authorIds)
+    {
+        return GenreQuery(genreIds) + AuthorQuery(authorIds);
+    }
 }

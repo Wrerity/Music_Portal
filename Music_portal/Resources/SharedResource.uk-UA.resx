@@ -236,4 +236,6 @@
   <data name="Confirm_DeleteSongAdmin" xml:space="preserve"><value>Видалити пісню {0}? Файл буде видалено з сервера.</value></data>
   <data name="Placeholder_SearchTitle" xml:space="preserve"><value>Пошук за назвою...</value></data>
   <data name="Admin_Empty" xml:space="preserve"><value>—</value></data>
+  <data name="Filter_Authors" xml:space="preserve"><value>Виконавець</value></data>
+  <data name="Filter_AllAuthors" xml:space="preserve"><value>Усі виконавці</value></data>
 </root>
