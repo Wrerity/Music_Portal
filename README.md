@@ -9,7 +9,7 @@
 ### 1. Клиент (отдельно от WebApi)
 Перейдите в директорию, где находится исполняемый файл клиента, и запустите его:
 ```bash
-.\Music_portal\Music_portal.sln(или Music_portal.slnx)
+.\Music_portal.sln(или Music_portal.slnx)
 ```
 
 ### 2. WebApi
