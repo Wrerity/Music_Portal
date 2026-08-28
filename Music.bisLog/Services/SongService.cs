@@ -26,21 +26,23 @@ public class SongService : ISongService
 
     private string UploadsDirectory => Path.Combine(Directory.GetCurrentDirectory(), FilePaths.UploadFolder);
 
-    public async Task<CatalogDto> GetCatalogAsync(string? search, List<int>? genreIds, string sortBy, int page)
+    public async Task<CatalogDto> GetCatalogAsync(string? search, List<int>? genreIds, List<int>? authorIds, string sortBy, int page)
     {
-        var result = await _uow.Songs.GetFilteredAsync(search, genreIds, sortBy, page, CatalogPageSize);
+        var result = await _uow.Songs.GetFilteredAsync(search, genreIds, authorIds, sortBy, page, CatalogPageSize);
 
         return new CatalogDto
         {
             SearchTerm = search ?? "",
             SelectedGenreIds = genreIds ?? new List<int>(),
+            SelectedAuthorIds = authorIds ?? new List<int>(),
             SortBy = sortBy,
             Page = result.PageNumber,
             PageSize = result.PageSize,
             TotalCount = result.TotalCount,
             TotalPages = result.TotalPages,
             Songs = _mapper.Map<List<SongDto>>(result.Items),
-            AllGenres = await _genreService.GetAllLightAsync()
+            AllGenres = await _genreService.GetAllLightAsync(),
+            AllAuthors = await GetAuthorsLightAsync()
         };
     }
 

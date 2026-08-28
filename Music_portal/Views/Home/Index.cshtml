@@ -10,7 +10,7 @@
 </div>
 
 <form method="get" asp-action="Index" class="row g-2 mb-4 align-items-end">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <label class="form-label text-dark-custom">@Loc["Filter_Search"]</label>
         <input type="text" name="search" class="form-control" value="@Model.SearchTerm" placeholder="@Loc["Filter_SearchPlaceholder"]" />
     </div>
@@ -25,6 +25,16 @@
         </select>
     </div>
     <div class="col-md-2">
+        <label class="form-label text-dark-custom">@Loc["Filter_Authors"]</label>
+        <select name="authorIds" class="form-select">
+            <option value="">@Loc["Filter_AllAuthors"]</option>
+            @foreach (var a in Model.AllAuthors)
+            {
+                <option value="@a.Id" selected="@Model.SelectedAuthorIds.Contains(a.Id)">@a.Name</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
         <label class="form-label text-dark-custom">@Loc["Filter_Sort"]</label>
         <select name="sortBy" class="form-select">
             <option value="date" selected="@(Model.SortBy=="date")">@Loc["Sort_New"]</option>
@@ -32,7 +42,7 @@
             <option value="title" selected="@(Model.SortBy=="title")">@Loc["Sort_Title"]</option>
         </select>
     </div>
-    <div class="col-md-4 d-flex gap-1 align-items-end">
+    <div class="col-md-3 d-flex gap-1 align-items-end">
         <button type="submit" class="btn btn-accent flex-fill">@Loc["Filter_Apply"]</button>
         <a asp-action="Index" class="btn btn-outline-dark-custom flex-fill">@Loc["Filter_Reset"]</a>
     </div>
@@ -79,7 +89,7 @@
             @for (int p = 1; p <= Model.TotalPages; p++)
             {
                 <li class="page-item @(p == Model.Page ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("Index", new { search = Model.SearchTerm, sortBy = Model.SortBy, page = p })@ViewHelper.GenreQuery(Model.SelectedGenreIds)">@p</a>
+                    <a class="page-link" href="@Url.Action("Index", new { search = Model.SearchTerm, sortBy = Model.SortBy, page = p })@ViewHelper.FilterQuery(Model.SelectedGenreIds, Model.SelectedAuthorIds)">@p</a>
                 </li>
             }
         </ul>

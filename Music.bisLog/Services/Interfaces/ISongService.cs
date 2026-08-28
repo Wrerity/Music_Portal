@@ -4,7 +4,7 @@ namespace Music.bisLog.Services;
 
 public interface ISongService
 {
-    Task<CatalogDto> GetCatalogAsync(string? search, List<int>? genreIds, string sortBy, int page);
+    Task<CatalogDto> GetCatalogAsync(string? search, List<int>? genreIds, List<int>? authorIds, string sortBy, int page);
     Task<SongDetailDto?> GetDetailAsync(int id);
     Task<List<SongDto>> GetUserSongsAsync(int userId);
     Task<OperationResult> CreateAsync(CreateSongDto dto);
