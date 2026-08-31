@@ -1,4 +1,5 @@
 using Music.bisLog.Dtos;
+using Music.bisLog.Exceptions;
 using Music.bisLog.Services;
 using Music.DataAccess.Models;
 
@@ -18,22 +19,16 @@ public class UserServiceTests : ServiceTestBase
     {
         var user = await CreateRegisteredUserAsync();
         var service = CreateUserService();
-
-        var result = await service.ActivateUserAsync(new ActivateUserDto { UserId = user.Id });
-
-        Assert.True(result.Success);
+        await service.ActivateUserAsync(new ActivateUserDto { UserId = user.Id });
         var updated = await Uow.Users.GetByIdAsync(user.Id);
         Assert.True(updated!.IsApproved);
     }
 
     [Fact]
-    public async Task ActivateUser_MissingUser_Fails()
+    public async Task ActivateUser_MissingUser_Throws()
     {
         var service = CreateUserService();
-
-        var result = await service.ActivateUserAsync(new ActivateUserDto { UserId = 9999 });
-
-        Assert.False(result.Success);
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => service.ActivateUserAsync(new ActivateUserDto { UserId = 9999 }));
     }
 
     [Fact]
@@ -41,10 +36,7 @@ public class UserServiceTests : ServiceTestBase
     {
         var user = await CreateRegisteredUserAsync();
         var service = CreateUserService();
-
-        var result = await service.RejectUserAsync(user.Id);
-
-        Assert.True(result.Success);
+        await service.RejectUserAsync(user.Id);
         Assert.Null(await Uow.Users.GetByIdAsync(user.Id));
     }
 
@@ -56,10 +48,8 @@ public class UserServiceTests : ServiceTestBase
         var approved = await Uow.Users.GetByUsernameAsync("active1");
         approved!.IsApproved = true;
         await Uow.Users.UpdateAsync(approved);
-
         var service = CreateUserService();
         var pendingList = await service.GetPendingAsync();
-
         Assert.Contains(pendingList, u => u.Id == pending.Id);
         Assert.DoesNotContain(pendingList, u => u.Id == active.Id);
     }
@@ -69,16 +59,8 @@ public class UserServiceTests : ServiceTestBase
     {
         await Uow.Roles.AddAsync(new Role { Name = "Admin" });
         var service = CreateUserService();
-
-        var result = await service.CreateAsync(new CreateUserDto
-        {
-            Username = "admin1",
-            Password = "Pass123",
-            Role = "Admin",
-            IsApproved = true
-        });
-
-        Assert.True(result.Success);
+        var user = await service.CreateAsync(new CreateUserDto { Username = "admin1", Password = "Pass123", Role = "Admin", IsApproved = true });
+        Assert.Equal("admin1", user.Username);
         var dto = await service.GetUserAsync((await Uow.Users.GetByUsernameAsync("admin1"))!.Id);
         Assert.NotNull(dto);
         Assert.Equal("Admin", dto!.Role);
@@ -90,18 +72,9 @@ public class UserServiceTests : ServiceTestBase
     {
         await Uow.Roles.AddAsync(new Role { Name = "Admin" });
         var service = CreateUserService();
-        await service.CreateAsync(new CreateUserDto
-        {
-            Username = "admin1",
-            Password = "Pass123",
-            Role = "Admin",
-            IsApproved = true
-        });
+        await service.CreateAsync(new CreateUserDto { Username = "admin1", Password = "Pass123", Role = "Admin", IsApproved = true });
         var admin = await Uow.Users.GetByUsernameAsync("admin1");
-
-        var result = await service.DeleteAsync(admin!.Id);
-
-        Assert.False(result.Success);
+        await Assert.ThrowsAsync<AccessDeniedException>(() => service.DeleteAsync(admin!.Id));
     }
 
     [Fact]
@@ -109,10 +82,15 @@ public class UserServiceTests : ServiceTestBase
     {
         var user = await CreateRegisteredUserAsync();
         var service = CreateUserService();
-
-        var result = await service.DeleteAsync(user.Id);
-
-        Assert.True(result.Success);
+        await service.DeleteAsync(user.Id);
         Assert.Null(await Uow.Users.GetByIdAsync(user.Id));
+    }
+
+    [Fact]
+    public async Task CreateUser_Duplicate_Throws()
+    {
+        var service = CreateUserService();
+        await service.CreateAsync(new CreateUserDto { Username = "dup", Password = "Pass123", Role = "User", IsApproved = true });
+        await Assert.ThrowsAsync<UserAlreadyExistsException>(() => service.CreateAsync(new CreateUserDto { Username = "dup", Password = "Pass123", Role = "User", IsApproved = true }));
     }
 }

@@ -54,9 +54,7 @@ public class SongsController : ApiControllerBase
     [Authorize]
     public async Task<IActionResult> Create([FromForm] CreateSongForm form)
     {
-        var fileError = ValidateAudioFile(form.AudioFile, required: true);
-        if (fileError != null) return fileError;
-
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
         var dto = new CreateSongDto
         {
             Title = form.Title,
@@ -70,55 +68,37 @@ public class SongsController : ApiControllerBase
             AudioFileName = form.AudioFile.FileName
         };
 
-        var result = await _songService.CreateAsync(dto);
-        return FromResult(result);
+        var createdSong = await _songService.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = createdSong.Id }, createdSong);
     }
 
     [HttpPut("{id:int}")]
     [Authorize]
     public async Task<IActionResult> Update(int id, [FromForm] UpdateSongForm form)
     {
-        var fileError = ValidateAudioFile(form.AudioFile, required: false);
-        if (fileError != null) return fileError;
-
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
         if (User.IsInRole(RoleNames.Admin))
         {
             var adminUserId = form.UserId ?? (await ResolveSongUserIdAsync(id));
             if (adminUserId == null)
                 return NotFound(ApiProblem(StatusCodes.Status404NotFound, "Ресурс не найден", "Песня не найдена"));
-
             var adminDto = new AdminUpdateSongDto
             {
-                Id = id,
-                Title = form.Title,
-                Duration = form.Duration,
-                Lyrics = form.Lyrics,
-                UserId = adminUserId.Value,
-                AuthorIds = form.AuthorIds?.ToArray() ?? Array.Empty<int>(),
-                GenreIds = form.GenreIds?.ToArray() ?? Array.Empty<int>(),
-                NewAuthorName = form.NewAuthorName,
-                AudioStream = form.AudioFile?.OpenReadStream(),
-                AudioFileName = form.AudioFile?.FileName
+                Id = id, Title = form.Title, Duration = form.Duration, Lyrics = form.Lyrics, UserId = adminUserId.Value,
+                AuthorIds = form.AuthorIds?.ToArray() ?? Array.Empty<int>(), GenreIds = form.GenreIds?.ToArray() ?? Array.Empty<int>(),
+                NewAuthorName = form.NewAuthorName, AudioStream = form.AudioFile?.OpenReadStream(), AudioFileName = form.AudioFile?.FileName
             };
-
-            return FromResult(await _songService.AdminUpdateAsync(adminDto));
+            var updated = await _songService.AdminUpdateAsync(adminDto);
+            return Ok(updated);
         }
-
         var dto = new UpdateSongDto
         {
-            Id = id,
-            Title = form.Title,
-            Duration = form.Duration,
-            Lyrics = form.Lyrics,
-            UserId = GetCurrentUserId(),
-            AuthorIds = form.AuthorIds?.ToArray() ?? Array.Empty<int>(),
-            GenreIds = form.GenreIds?.ToArray() ?? Array.Empty<int>(),
-            NewAuthorName = form.NewAuthorName,
-            AudioStream = form.AudioFile?.OpenReadStream(),
-            AudioFileName = form.AudioFile?.FileName
+            Id = id, Title = form.Title, Duration = form.Duration, Lyrics = form.Lyrics, UserId = GetCurrentUserId(),
+            AuthorIds = form.AuthorIds?.ToArray() ?? Array.Empty<int>(), GenreIds = form.GenreIds?.ToArray() ?? Array.Empty<int>(),
+            NewAuthorName = form.NewAuthorName, AudioStream = form.AudioFile?.OpenReadStream(), AudioFileName = form.AudioFile?.FileName
         };
-
-        return FromResult(await _songService.UpdateAsync(dto));
+        var result = await _songService.UpdateAsync(dto);
+        return Ok(result);
     }
 
     [HttpDelete("{id:int}")]
@@ -126,15 +106,12 @@ public class SongsController : ApiControllerBase
     public async Task<IActionResult> Delete(int id)
     {
         if (User.IsInRole(RoleNames.Admin))
-            return FromResult(await _songService.AdminDeleteAsync(id));
-
-        var result = await _songService.DeleteAsync(new DeleteSongDto
         {
-            SongId = id,
-            UserId = GetCurrentUserId()
-        });
-
-        return FromResult(result);
+            await _songService.AdminDeleteAsync(id);
+            return NoContent();
+        }
+        await _songService.DeleteAsync(new DeleteSongDto { SongId = id, UserId = GetCurrentUserId() });
+        return NoContent();
     }
 
     [HttpGet("{id:int}/download")]

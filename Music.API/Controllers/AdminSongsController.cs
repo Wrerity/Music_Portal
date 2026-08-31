@@ -43,9 +43,7 @@ public class AdminSongsController : ApiControllerBase
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromForm] UpdateSongForm form)
     {
-        var fileError = ValidateAudioFile(form.AudioFile, required: false);
-        if (fileError != null) return fileError;
-
+        if (!ModelState.IsValid) return ValidationProblem(ModelState);
         var userId = form.UserId ?? (await _songService.GetAdminEditDataAsync(id))?.UserId;
         if (userId == null)
             return NotFound(ApiProblem(StatusCodes.Status404NotFound, "Ресурс не найден", "Песня не найдена"));
@@ -64,12 +62,14 @@ public class AdminSongsController : ApiControllerBase
             AudioFileName = form.AudioFile?.FileName
         };
 
-        return FromResult(await _songService.AdminUpdateAsync(dto));
+        var updated = await _songService.AdminUpdateAsync(dto);
+        return Ok(updated);
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        return FromResult(await _songService.AdminDeleteAsync(id));
+        await _songService.AdminDeleteAsync(id);
+        return NoContent();
     }
 }

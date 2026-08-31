@@ -9,9 +9,10 @@ public interface IUserService
     Task<List<UserDto>> GetPendingAsync();
     Task<int> CountAsync();
     Task<int> CountPendingAsync();
-    Task<OperationResult> CreateAsync(CreateUserDto dto);
-    Task<OperationResult> UpdateAsync(UpdateUserDto dto);
-    Task<OperationResult> DeleteAsync(int userId);
-    Task<OperationResult> ActivateUserAsync(ActivateUserDto dto);
-    Task<OperationResult> RejectUserAsync(int userId);
+    // Бизнес-слой возвращает DTO или выбрасывает исключение, без Success/Error флагов
+    Task<UserDto> CreateAsync(CreateUserDto dto);
+    Task<UserDto> UpdateAsync(UpdateUserDto dto);
+    Task DeleteAsync(int userId);
+    Task ActivateUserAsync(ActivateUserDto dto);
+    Task RejectUserAsync(int userId);
 }

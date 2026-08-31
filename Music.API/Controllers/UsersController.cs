@@ -48,39 +48,40 @@ public class UsersController : ApiControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] CreateUserDto dto)
     {
-        if (string.IsNullOrWhiteSpace(dto.Username) || string.IsNullOrWhiteSpace(dto.Password))
-            return BadRequest(ApiProblem(StatusCodes.Status400BadRequest, "Ошибка запроса", "Имя пользователя и пароль обязательны"));
-
-        var result = await _userService.CreateAsync(dto);
-        return FromResult(result);
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+        var user = await _userService.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
     }
 
     [HttpPut("{id:int}")]
     public async Task<IActionResult> Update(int id, [FromBody] UpdateUserDto dto)
     {
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
         dto.Id = id;
-        var result = await _userService.UpdateAsync(dto);
-        return FromResult(result);
+        var user = await _userService.UpdateAsync(dto);
+        return Ok(user);
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await _userService.DeleteAsync(id);
-        return FromResult(result);
+        await _userService.DeleteAsync(id);
+        return NoContent();
     }
 
     [HttpPost("{id:int}/activate")]
     public async Task<IActionResult> Activate(int id)
     {
-        var result = await _userService.ActivateUserAsync(new ActivateUserDto { UserId = id });
-        return FromResult(result);
+        await _userService.ActivateUserAsync(new ActivateUserDto { UserId = id });
+        return Ok();
     }
 
     [HttpPost("{id:int}/reject")]
     public async Task<IActionResult> Reject(int id)
     {
-        var result = await _userService.RejectUserAsync(id);
-        return FromResult(result);
+        await _userService.RejectUserAsync(id);
+        return NoContent();
     }
 }

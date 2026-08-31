@@ -26,11 +26,11 @@ public abstract class ServiceTestBase : IDisposable
         Hasher = new PasswordHasher();
     }
 
-    protected IAuthService CreateAuthService() => new AuthService(Uow, Hasher, NullLogger<AuthService>.Instance);
+    protected IAuthService CreateAuthService() => new AuthService(Uow, Hasher, Mapper);
     protected IUserService CreateUserService() => new UserService(Uow, Hasher, Mapper, NullLogger<UserService>.Instance);
-    protected IGenreService CreateGenreService() => new GenreService(Uow, Mapper, NullLogger<GenreService>.Instance);
-    protected IAuthorService CreateAuthorService() => new AuthorService(Uow, Mapper, NullLogger<AuthorService>.Instance);
-    protected ISongService CreateSongService() => new SongService(Uow, CreateGenreService(), NullLogger<SongService>.Instance, Mapper);
+    protected IGenreService CreateGenreService() => new GenreService(Uow, Mapper);
+    protected IAuthorService CreateAuthorService() => new AuthorService(Uow, Mapper);
+    protected ISongService CreateSongService() => new SongService(Uow, CreateGenreService(), Mapper);
 
     public void Dispose()
     {

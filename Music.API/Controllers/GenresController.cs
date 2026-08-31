@@ -16,9 +16,18 @@ public class GenresController : ApiControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAll([FromQuery] string? search)
     {
+        // 6. Поиск по имени жанра
+        if (!string.IsNullOrWhiteSpace(search))
+            return Ok(await _genreService.SearchAsync(search));
         return Ok(await _genreService.GetAllAsync());
+    }
+
+    [HttpGet("search")]
+    public async Task<IActionResult> Search([FromQuery] string? query)
+    {
+        return Ok(await _genreService.SearchAsync(query));
     }
 
     [HttpGet("light")]
@@ -41,24 +50,28 @@ public class GenresController : ApiControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] GenreDto dto)
     {
-        if (string.IsNullOrWhiteSpace(dto.Name))
-            return BadRequest(ApiProblem(StatusCodes.Status400BadRequest, "Ошибка запроса", "Название жанра обязательно"));
-
-        return FromResult(await _genreService.CreateAsync(dto));
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+        var created = await _genreService.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(int id, [FromBody] GenreDto dto)
     {
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
         dto.Id = id;
-        return FromResult(await _genreService.UpdateAsync(dto));
+        var updated = await _genreService.UpdateAsync(dto);
+        return Ok(updated);
     }
 
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
-        return FromResult(await _genreService.DeleteAsync(id));
+        await _genreService.DeleteAsync(id);
+        return NoContent();
     }
 }

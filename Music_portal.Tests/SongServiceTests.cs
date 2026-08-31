@@ -1,4 +1,5 @@
 using Music.bisLog.Dtos;
+using Music.bisLog.Exceptions;
 using Music.bisLog.Services;
 using Music.DataAccess.Models;
 
@@ -15,10 +16,8 @@ public class SongServiceTests : ServiceTestBase
         var user = (await Uow.Users.GetByUsernameAsync("owner"))!;
         user.IsApproved = true;
         await Uow.Users.UpdateAsync(user);
-
         var genre = await Uow.Genres.AddAsync(new Genre { Name = "Rock" });
         var author = await Uow.Authors.AddAsync(new Author { Name = "Artist" });
-
         return (user, genre.Id, author.Id);
     }
 
@@ -26,30 +25,21 @@ public class SongServiceTests : ServiceTestBase
     {
         return new CreateSongDto
         {
-            Title = "Song",
-            UserId = userId,
-            Duration = 180,
-            Lyrics = "Lyrics",
-            AuthorIds = new[] { authorId },
-            GenreIds = new[] { genreId },
-            AudioFileName = "song.mp3",
-            AudioStream = new MemoryStream(new byte[] { 1, 2, 3, 4 })
+            Title = "Song", UserId = userId, Duration = 180, Lyrics = "Lyrics",
+            AuthorIds = new[] { authorId }, GenreIds = new[] { genreId },
+            AudioFileName = "song.mp3", AudioStream = new MemoryStream(new byte[] { 1, 2, 3, 4 })
         };
     }
 
     [Fact]
-    public async Task Create_ByUnapprovedUser_Fails()
+    public async Task Create_ByUnapprovedUser_Throws()
     {
         await CreateAuthService().RegisterAsync(new RegisterRequestDto { Username = "owner", Password = "Pass123" });
         var user = (await Uow.Users.GetByUsernameAsync("owner"))!;
         var genre = await Uow.Genres.AddAsync(new Genre { Name = "Rock" });
         var author = await Uow.Authors.AddAsync(new Author { Name = "Artist" });
         var service = CreateSongService();
-
-        var result = await service.CreateAsync(BuildCreateDto(user.Id, genre.Id, author.Id));
-
-        Assert.False(result.Success);
-        Assert.Contains("подтверждена", result.Error);
+        await Assert.ThrowsAsync<AccessDeniedException>(() => service.CreateAsync(BuildCreateDto(user.Id, genre.Id, author.Id)));
     }
 
     [Fact]
@@ -57,52 +47,37 @@ public class SongServiceTests : ServiceTestBase
     {
         var (user, genreId, authorId) = await SeedActiveUserWithDefaultsAsync();
         var service = CreateSongService();
-
-        var result = await service.CreateAsync(BuildCreateDto(user.Id, genreId, authorId));
-
-        Assert.True(result.Success);
-        var songs = await Uow.Songs.GetByUserIdAsync(user.Id);
-        var song = Assert.Single(songs);
+        var song = await service.CreateAsync(BuildCreateDto(user.Id, genreId, authorId));
         Assert.Equal("Song", song.Title);
+        var songs = await Uow.Songs.GetByUserIdAsync(user.Id);
+        var dbSong = Assert.Single(songs);
+        Assert.Equal("Song", dbSong.Title);
     }
 
     [Fact]
-    public async Task Edit_ByNonOwner_Fails()
+    public async Task Edit_ByNonOwner_Throws()
     {
         var (owner, genreId, authorId) = await SeedActiveUserWithDefaultsAsync();
         var service = CreateSongService();
         await service.CreateAsync(BuildCreateDto(owner.Id, genreId, authorId));
         var song = (await Uow.Songs.GetByUserIdAsync(owner.Id)).Single();
-
         await CreateAuthService().RegisterAsync(new RegisterRequestDto { Username = "intruder", Password = "Pass123" });
         var intruder = (await Uow.Users.GetByUsernameAsync("intruder"))!;
-
-        var result = await service.UpdateAsync(new UpdateSongDto
-        {
-            Id = song.Id,
-            UserId = intruder.Id,
-            Title = "Hijacked"
-        });
-
-        Assert.False(result.Success);
-        Assert.Contains("не найдена", result.Error);
+        intruder.IsApproved = true; await Uow.Users.UpdateAsync(intruder);
+        await Assert.ThrowsAsync<EntityNotFoundException>(() => service.UpdateAsync(new UpdateSongDto { Id = song.Id, UserId = intruder.Id, Title = "Hijacked" }));
     }
 
     [Fact]
-    public async Task Delete_ByNonOwner_Fails()
+    public async Task Delete_ByNonOwner_Throws()
     {
         var (owner, genreId, authorId) = await SeedActiveUserWithDefaultsAsync();
         var service = CreateSongService();
         await service.CreateAsync(BuildCreateDto(owner.Id, genreId, authorId));
         var song = (await Uow.Songs.GetByUserIdAsync(owner.Id)).Single();
-
         await CreateAuthService().RegisterAsync(new RegisterRequestDto { Username = "intruder", Password = "Pass123" });
         var intruder = (await Uow.Users.GetByUsernameAsync("intruder"))!;
-
-        var result = await service.DeleteAsync(new DeleteSongDto { SongId = song.Id, UserId = intruder.Id });
-
-        Assert.False(result.Success);
-        Assert.Contains("чужую", result.Error);
+        intruder.IsApproved = true; await Uow.Users.UpdateAsync(intruder);
+        await Assert.ThrowsAsync<AccessDeniedException>(() => service.DeleteAsync(new DeleteSongDto { SongId = song.Id, UserId = intruder.Id }));
         Assert.NotNull(await Uow.Songs.GetByIdAsync(song.Id));
     }
 
@@ -113,12 +88,9 @@ public class SongServiceTests : ServiceTestBase
         var service = CreateSongService();
         await service.CreateAsync(BuildCreateDto(owner.Id, genreId, authorId));
         var song = (await Uow.Songs.GetByUserIdAsync(owner.Id)).Single();
-
         await CreateAuthService().RegisterAsync(new RegisterRequestDto { Username = "intruder", Password = "Pass123" });
         var intruder = (await Uow.Users.GetByUsernameAsync("intruder"))!;
-
         var data = await service.GetEditDataAsync(song.Id, intruder.Id);
-
         Assert.Null(data);
     }
 
@@ -129,14 +101,11 @@ public class SongServiceTests : ServiceTestBase
         var service = CreateSongService();
         await service.CreateAsync(BuildCreateDto(owner.Id, genreId, authorId));
         var song = (await Uow.Songs.GetByUserIdAsync(owner.Id)).Single();
-
         var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), UploadsDirName);
         Directory.CreateDirectory(uploadsDir);
         var fakePath = Path.Combine(uploadsDir, song.FilePath);
         await File.WriteAllBytesAsync(fakePath, new byte[] { 0, 1, 2, 3 });
-
         var result = await service.DownloadAsync(song.Id);
-
         Assert.True(result.Success);
         var reloaded = (await Uow.Songs.GetByIdWithDetailsAsync(song.Id))!;
         Assert.Equal(1, reloaded.PlayCount);
@@ -150,20 +119,10 @@ public class SongServiceTests : ServiceTestBase
         var service = CreateSongService();
         await service.CreateAsync(BuildCreateDto(owner.Id, genreId, authorId));
         var song = (await Uow.Songs.GetByUserIdAsync(owner.Id)).Single();
-
-        var result = await service.AdminUpdateAsync(new AdminUpdateSongDto
-        {
-            Id = song.Id,
-            UserId = owner.Id,
-            Title = "Renamed",
-            Duration = 120,
-            AuthorIds = new[] { authorId },
-            GenreIds = new[] { genreId }
-        });
-
-        Assert.True(result.Success);
-        var updated = (await Uow.Songs.GetByIdWithDetailsAsync(song.Id))!;
+        var updated = await service.AdminUpdateAsync(new AdminUpdateSongDto { Id = song.Id, UserId = owner.Id, Title = "Renamed", Duration = 120, AuthorIds = new[] { authorId }, GenreIds = new[] { genreId } });
         Assert.Equal("Renamed", updated.Title);
+        var db = (await Uow.Songs.GetByIdWithDetailsAsync(song.Id))!;
+        Assert.Equal("Renamed", db.Title);
     }
 
     [Fact]
@@ -173,10 +132,17 @@ public class SongServiceTests : ServiceTestBase
         var service = CreateSongService();
         await service.CreateAsync(BuildCreateDto(owner.Id, genreId, authorId));
         var song = (await Uow.Songs.GetByUserIdAsync(owner.Id)).Single();
-
-        var result = await service.AdminDeleteAsync(song.Id);
-
-        Assert.True(result.Success);
+        await service.AdminDeleteAsync(song.Id);
         Assert.Null(await Uow.Songs.GetByIdAsync(song.Id));
+    }
+
+    [Fact]
+    public async Task Create_InvalidExtension_Throws()
+    {
+        var (user, genreId, authorId) = await SeedActiveUserWithDefaultsAsync();
+        var service = CreateSongService();
+        var dto = BuildCreateDto(user.Id, genreId, authorId);
+        dto.AudioFileName = "song.txt";
+        await Assert.ThrowsAsync<BusinessValidationException>(() => service.CreateAsync(dto));
     }
 }

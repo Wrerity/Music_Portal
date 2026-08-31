@@ -41,24 +41,28 @@ public class AuthorsController : ApiControllerBase
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Create([FromBody] AuthorDto dto)
     {
-        if (string.IsNullOrWhiteSpace(dto.Name))
-            return BadRequest(ApiProblem(StatusCodes.Status400BadRequest, "Ошибка запроса", "Имя автора обязательно"));
-
-        return FromResult(await _authorService.CreateAsync(dto));
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+        var created = await _authorService.CreateAsync(dto);
+        return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Update(int id, [FromBody] AuthorDto dto)
     {
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
         dto.Id = id;
-        return FromResult(await _authorService.UpdateAsync(dto));
+        var updated = await _authorService.UpdateAsync(dto);
+        return Ok(updated);
     }
 
     [HttpDelete("{id:int}")]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
-        return FromResult(await _authorService.DeleteAsync(id));
+        await _authorService.DeleteAsync(id);
+        return NoContent();
     }
 }

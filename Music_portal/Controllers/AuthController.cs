@@ -33,15 +33,17 @@ public class AuthController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var result = await _authService.RegisterAsync(new RegisterRequestDto
+        try
         {
-            Username = model.Username,
-            Password = model.Password
-        });
-
-        if (!result.Success)
+            await _authService.RegisterAsync(new RegisterRequestDto
+            {
+                Username = model.Username,
+                Password = model.Password
+            });
+        }
+        catch (Music.bisLog.Exceptions.UserAlreadyExistsException ex)
         {
-            ModelState.AddModelError(string.Empty, result.Error);
+            ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);
         }
 
@@ -64,15 +66,28 @@ public class AuthController : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var result = await _authService.LoginAsync(new LoginRequestDto
+        LoginResultDto result;
+        try
         {
-            Username = model.Username,
-            Password = model.Password
-        });
-
-        if (!result.Success)
+            result = await _authService.LoginAsync(new LoginRequestDto
+            {
+                Username = model.Username,
+                Password = model.Password
+            });
+        }
+        catch (Music.bisLog.Exceptions.UserNotFoundException ex)
         {
-            ModelState.AddModelError(string.Empty, result.Error);
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return View(model);
+        }
+        catch (Music.bisLog.Exceptions.InvalidCredentialsException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
+            return View(model);
+        }
+        catch (Music.bisLog.Exceptions.UserNotApprovedException ex)
+        {
+            ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);
         }
 

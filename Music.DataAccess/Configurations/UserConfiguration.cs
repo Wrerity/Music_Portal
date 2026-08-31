@@ -9,6 +9,9 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.HasIndex(u => u.Username).IsUnique();
+        // 1. Явное маппинг Salt — колонка обязательна, иначе Invalid column name "Salt"
+        builder.Property(u => u.Salt).IsRequired().HasColumnName("Salt");
+        builder.Property(u => u.PasswordHash).IsRequired();
 
         builder.HasMany(u => u.Roles)
             .WithMany(r => r.Users)

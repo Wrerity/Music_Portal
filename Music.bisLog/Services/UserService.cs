@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Music.bisLog.Dtos;
+using Music.bisLog.Exceptions;
 using Music.DataAccess.Data;
 using Music.DataAccess.Models;
 using Music.DataAccess.Utils;
@@ -24,198 +25,99 @@ public class UserService : IUserService
 
     public async Task<UserDto?> GetUserAsync(int userId)
     {
-        try
-        {
-            var user = await _uow.Users.GetByIdWithRolesAsync(userId);
-            return user == null ? null : _mapper.Map<UserDto>(user);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Ошибка при получении пользователя {UserId}", userId);
-            return null;
-        }
+        var user = await _uow.Users.GetByIdWithRolesAsync(userId);
+        return user == null ? null : _mapper.Map<UserDto>(user);
     }
 
     public async Task<UserListDto> GetUsersAsync(string? search, int page, int pageSize)
     {
-        try
+        var result = await _uow.Users.GetPagedAsync(search, page, pageSize);
+        return new UserListDto
         {
-            var result = await _uow.Users.GetPagedAsync(search, page, pageSize);
-            return new UserListDto
-            {
-                Search = search,
-                Page = result.PageNumber,
-                PageSize = result.PageSize,
-                TotalCount = result.TotalCount,
-                TotalPages = result.TotalPages,
-                Users = _mapper.Map<List<UserDto>>(result.Items)
-            };
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Ошибка при получении списка пользователей");
-            return new UserListDto { Search = search, Page = page, PageSize = pageSize };
-        }
+            Search = search,
+            Page = result.PageNumber,
+            PageSize = result.PageSize,
+            TotalCount = result.TotalCount,
+            TotalPages = result.TotalPages,
+            Users = _mapper.Map<List<UserDto>>(result.Items)
+        };
     }
 
     public async Task<List<UserDto>> GetPendingAsync()
     {
-        try
-        {
-            var users = await _uow.Users.GetByApprovalStatusAsync(false);
-            return _mapper.Map<List<UserDto>>(users);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Ошибка при получении списка заявок на регистрацию");
-            return new List<UserDto>();
-        }
+        var users = await _uow.Users.GetByApprovalStatusAsync(false);
+        return _mapper.Map<List<UserDto>>(users);
     }
 
-    public async Task<int> CountAsync()
-    {
-        return await _uow.Users.CountAsync();
-    }
+    public async Task<int> CountAsync() => await _uow.Users.CountAsync();
+    public async Task<int> CountPendingAsync() => await _uow.Users.CountByApprovalStatusAsync(false);
 
-    public async Task<int> CountPendingAsync()
+    public async Task<UserDto> CreateAsync(CreateUserDto dto)
     {
-        return await _uow.Users.CountByApprovalStatusAsync(false);
-    }
+        if (await _uow.Users.GetByUsernameAsync(dto.Username) != null)
+            throw new UserAlreadyExistsException($"Пользователь с именем '{dto.Username}' уже существует");
 
-    public async Task<OperationResult> CreateAsync(CreateUserDto dto)
-    {
-        try
+        var (hash, salt) = _hasher.Hash(dto.Password);
+        var role = await _uow.Roles.GetByNameAsync(dto.Role);
+        var user = new User
         {
-            if (await _uow.Users.GetByUsernameAsync(dto.Username) != null)
-                return OperationResult.Fail("Пользователь с таким именем уже существует");
+            Username = dto.Username,
+            PasswordHash = hash,
+            Salt = salt,
+            IsApproved = dto.IsApproved,
+            CreatedAt = DateTime.UtcNow
+        };
+        if (role != null) user.Roles.Add(role);
+        await _uow.Users.AddAsync(user);
+        return _mapper.Map<UserDto>(user);
+    }
 
+    public async Task<UserDto> UpdateAsync(UpdateUserDto dto)
+    {
+        var user = await _uow.Users.GetByIdWithRolesAsync(dto.Id);
+        if (user == null) throw new EntityNotFoundException("Пользователь не найден");
+        var byName = await _uow.Users.GetByUsernameAsync(dto.Username);
+        if (byName != null && byName.Id != dto.Id) throw new UserAlreadyExistsException($"Пользователь с именем '{dto.Username}' уже существует");
+        user.Username = dto.Username;
+        user.IsApproved = dto.IsApproved;
+        var selectedRole = await _uow.Roles.GetByNameAsync(dto.Role);
+        if (selectedRole != null) { user.Roles.Clear(); user.Roles.Add(selectedRole); }
+        if (!string.IsNullOrWhiteSpace(dto.Password))
+        {
             var (hash, salt) = _hasher.Hash(dto.Password);
-
-            var role = await _uow.Roles.GetByNameAsync(dto.Role);
-            var user = new User
-            {
-                Username = dto.Username,
-                PasswordHash = hash,
-                Salt = salt,
-                IsApproved = dto.IsApproved,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            if (role != null)
-                user.Roles.Add(role);
-
-            await _uow.Users.AddAsync(user);
-            return OperationResult.Ok();
+            user.PasswordHash = hash; user.Salt = salt;
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Ошибка при создании пользователя {Username}", dto.Username);
-            return OperationResult.Fail("Произошла внутренняя ошибка при создании пользователя.");
-        }
+        await _uow.Users.UpdateAsync(user);
+        return _mapper.Map<UserDto>(user);
     }
 
-    public async Task<OperationResult> UpdateAsync(UpdateUserDto dto)
+    public async Task DeleteAsync(int userId)
     {
-        try
+        var user = await _uow.Users.GetByIdWithRolesAsync(userId);
+        if (user == null) throw new EntityNotFoundException("Пользователь не найден");
+        if (user.Roles.Any(r => r.Name == RoleNames.Admin)) throw new AccessDeniedException("Нельзя удалить администратора");
+        var userSongs = await _uow.Songs.GetByUserIdAsync(userId);
+        var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), FilePaths.UploadFolder);
+        foreach (var song in userSongs)
         {
-            var user = await _uow.Users.GetByIdWithRolesAsync(dto.Id);
-            if (user == null)
-                return OperationResult.Fail("Пользователь не найден");
-
-            var byName = await _uow.Users.GetByUsernameAsync(dto.Username);
-            if (byName != null && byName.Id != dto.Id)
-                return OperationResult.Fail("Пользователь с таким именем уже существует");
-
-            user.Username = dto.Username;
-            user.IsApproved = dto.IsApproved;
-
-            var selectedRole = await _uow.Roles.GetByNameAsync(dto.Role);
-            if (selectedRole != null)
-            {
-                user.Roles.Clear();
-                user.Roles.Add(selectedRole);
-            }
-
-            if (!string.IsNullOrWhiteSpace(dto.Password))
-            {
-                var (hash, salt) = _hasher.Hash(dto.Password);
-                user.PasswordHash = hash;
-                user.Salt = salt;
-            }
-
-            await _uow.Users.UpdateAsync(user);
-            return OperationResult.Ok();
+            var filePath = Path.Combine(uploadsDir, song.FilePath);
+            if (File.Exists(filePath)) File.Delete(filePath);
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Ошибка при обновлении пользователя {UserId}", dto.Id);
-            return OperationResult.Fail("Произошла внутренняя ошибка при обновлении пользователя.");
-        }
+        await _uow.Users.DeleteAsync(user);
     }
 
-    public async Task<OperationResult> DeleteAsync(int userId)
+    public async Task ActivateUserAsync(ActivateUserDto dto)
     {
-        try
-        {
-            var user = await _uow.Users.GetByIdWithRolesAsync(userId);
-            if (user == null)
-                return OperationResult.Ok();
-
-            if (user.Roles.Any(r => r.Name == RoleNames.Admin))
-                return OperationResult.Fail("Нельзя удалить администратора");
-
-            var userSongs = await _uow.Songs.GetByUserIdAsync(userId);
-            var uploadsDir = Path.Combine(Directory.GetCurrentDirectory(), FilePaths.UploadFolder);
-            foreach (var song in userSongs)
-            {
-                var filePath = Path.Combine(uploadsDir, song.FilePath);
-                if (File.Exists(filePath)) File.Delete(filePath);
-            }
-
-            await _uow.Users.DeleteAsync(user);
-            return OperationResult.Ok();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Ошибка при удалении пользователя {UserId}", userId);
-            return OperationResult.Fail("Произошла внутренняя ошибка при удалении пользователя.");
-        }
+        var user = await _uow.Users.GetByIdAsync(dto.UserId);
+        if (user == null) throw new EntityNotFoundException("Пользователь не найден");
+        user.IsApproved = true;
+        await _uow.Users.UpdateAsync(user);
     }
 
-    public async Task<OperationResult> ActivateUserAsync(ActivateUserDto dto)
+    public async Task RejectUserAsync(int userId)
     {
-        try
-        {
-            var user = await _uow.Users.GetByIdAsync(dto.UserId);
-            if (user == null)
-                return OperationResult.Fail("Пользователь не найден");
-
-            user.IsApproved = true;
-            await _uow.Users.UpdateAsync(user);
-            return OperationResult.Ok();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Ошибка при активации пользователя {UserId}", dto.UserId);
-            return OperationResult.Fail("Произошла внутренняя ошибка при активации пользователя.");
-        }
-    }
-
-    public async Task<OperationResult> RejectUserAsync(int userId)
-    {
-        try
-        {
-            var user = await _uow.Users.GetByIdAsync(userId);
-            if (user == null)
-                return OperationResult.Ok();
-
-            await _uow.Users.DeleteAsync(user);
-            return OperationResult.Ok();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Ошибка при отклонении заявки {UserId}", userId);
-            return OperationResult.Fail("Произошла внутренняя ошибка при отклонении заявки.");
-        }
+        var user = await _uow.Users.GetByIdAsync(userId);
+        if (user == null) throw new EntityNotFoundException("Пользователь не найден");
+        await _uow.Users.DeleteAsync(user);
     }
 }

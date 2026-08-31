@@ -20,9 +20,11 @@ public class MappingProfile : Profile
         CreateMap<Song, SongDetailDto>()
             .ForMember(d => d.UserId, opt => opt.MapFrom(s => s.User != null ? s.User.Id : 0))
             .ForMember(d => d.Authors, opt => opt.MapFrom(s =>
-                s.Authors.Select(a => a.Name).ToList()))
+                s.Authors.Select(a => new AuthorDto { Id = a.Id, Name = a.Name, Country = a.Country, Description = a.Description }).ToList()))
             .ForMember(d => d.Genres, opt => opt.MapFrom(s =>
-                s.Genres.Select(g => g.Name).ToList()))
+                s.Genres.Select(g => new GenreDto { Id = g.Id, Name = g.Name, Description = g.Description }).ToList()))
+            .ForMember(d => d.AuthorNames, opt => opt.Ignore())
+            .ForMember(d => d.GenreNames, opt => opt.Ignore())
             .ForMember(d => d.DurationFormatted, opt => opt.MapFrom(s =>
                 s.Duration > 0 ? $"{s.Duration / 60}:{s.Duration % 60:D2}" : ""))
             .ForMember(d => d.UploadDate, opt => opt.MapFrom(s => s.CreatedAt));
