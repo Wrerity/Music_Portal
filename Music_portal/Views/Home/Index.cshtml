@@ -82,19 +82,15 @@
     }
 </div>
 
-@if (Model.TotalPages > 1)
-{
-    <nav class="mt-4">
-        <ul class="pagination justify-content-center">
-            @for (int p = 1; p <= Model.TotalPages; p++)
-            {
-                <li class="page-item @(p == Model.Page ? "active" : "")">
-                    <a class="page-link" href="@Url.Action("Index", new { search = Model.SearchTerm, sortBy = Model.SortBy, page = p })@ViewHelper.FilterQuery(Model.SelectedGenreIds, Model.SelectedAuthorIds)">@p</a>
-                </li>
-            }
-        </ul>
-    </nav>
-}
+<div class="d-flex gap-2 mb-3 align-items-center">
+    <span class="text-muted">@Loc["Filter_Sort"]:</span>
+    <sort-link sort-by="date" current-sort-by="@Model.SortBy" search="@Model.SearchTerm" genre-ids="@Model.SelectedGenreIds" author-ids="@Model.SelectedAuthorIds" class="btn btn-sm @(Model.SortBy=="date" ? "btn-accent" : "btn-outline-dark-custom")">@Loc["Sort_New"]</sort-link>
+    <sort-link sort-by="popularity" current-sort-by="@Model.SortBy" search="@Model.SearchTerm" genre-ids="@Model.SelectedGenreIds" author-ids="@Model.SelectedAuthorIds" class="btn btn-sm @(Model.SortBy=="popularity" ? "btn-accent" : "btn-outline-dark-custom")">@Loc["Sort_Popular"]</sort-link>
+    <sort-link sort-by="title" current-sort-by="@Model.SortBy" search="@Model.SearchTerm" genre-ids="@Model.SelectedGenreIds" author-ids="@Model.SelectedAuthorIds" class="btn btn-sm @(Model.SortBy=="title" ? "btn-accent" : "btn-outline-dark-custom")">@Loc["Sort_Title"]</sort-link>
+    <span class="text-muted ms-auto">@Model.TotalCount @Loc["Song_Listeners"] — @Loc["Table_Plays"] @Model.Page/@Model.TotalPages</span>
+</div>
+
+<pagination total-pages="@Model.TotalPages" current-page="@Model.Page" search="@Model.SearchTerm" sort-by="@Model.SortBy" genre-ids="@Model.SelectedGenreIds" author-ids="@Model.SelectedAuthorIds"></pagination>
 
 @section Scripts {
     <script>

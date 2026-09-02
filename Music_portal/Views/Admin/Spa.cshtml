@@ -148,7 +148,7 @@ function authHeaders(isJson=true){
   return h;
 }
 async function apiFetch(method, path, body, isForm=false){
-  const opts={ method, headers: isForm ? { 'Authorization': token ? 'Bearer '+token : '' } : authHeaders(!isForm && body) };
+  const opts={ method, headers: isForm ? { 'Authorization': token ? 'Bearer '+token : '' } : authHeaders(!isForm && body), mode: 'cors', credentials: 'omit' };
   if(body) opts.body = isForm ? body : JSON.stringify(body);
   const res = await fetch(apiBase + path, opts);
   const text = await res.text();

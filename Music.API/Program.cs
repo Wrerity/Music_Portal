@@ -43,7 +43,7 @@ builder.Services.AddCors(options =>
     if (origins is { Length: > 0 } && origins.Any(o => o != "*"))
     {
         options.AddPolicy("ApiCorsPolicy", policy =>
-            policy.WithOrigins(origins).AllowAnyMethod().AllowAnyHeader());
+            policy.WithOrigins(origins).AllowAnyMethod().AllowAnyHeader().AllowCredentials());
     }
     else
     {
