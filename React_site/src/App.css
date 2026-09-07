@@ -1,0 +1,10 @@
+/* ≥14px для всех надписей */
+html{font-size:16px}
+body{font-size:14px; line-height:1.5; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin:0; background:#fafafa; color:#222}
+h1,h2,h3{font-size:20px}
+label,.form-label,.admin-label{font-size:14px !important; font-weight:600}
+input,select,textarea,.admin-input{font-size:14px !important; padding:8px; border:1px solid #ccc; border-radius:6px}
+button,.admin-btn,.nav-link{font-size:14px !important}
+small{font-size:14px}
+a{font-size:14px}
+p,span,li,td,th{font-size:14px}
