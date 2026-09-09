@@ -1,19 +1,15 @@
 # 🎵 Музыкальный портал
 
-Веб-приложение для прослушивания и управления музыкой. Проект состоит из двух частей:
-- **Клиентская часть** (отдельный запуск)
-- **WebApi** (серверная часть)
+## Запуск (корень)
 
-## Запуск
+**Один файл в корне — `MusicPortal.sln` (или `MusicPortal.slnx` для VS 2022+):**
+- `MusicPortal.sln` — 5 проектов: `Music_portal` (сайт `https://localhost:7078`), `Music.API` (`https://localhost:7090/swagger`), `Music.DataAccess`, `Music.bisLog`, `Tests`
+- `MusicPortal.slnx` — то же, новый XML-формат
 
-### 1. Клиент (отдельно от WebApi)
-Перейдите в директорию, где находится исполняемый файл клиента, и запустите его:
-```bash
-.\Music_portal.sln(или Music_portal.slnx)
-```
+**Как запустить:**
+1. `dotnet ef database update --project Music.DataAccess --startup-project Music.API` (1 раз, создает `MusicPortalDb` + `admin/admin123`)
+2. **Visual Studio:** открыть `MusicPortal.sln` в **корне** → `F5` (авто `Multiple startup projects`: `Music.API` + `Music_portal`) → `https://localhost:7078`
+3. **CLI:** `dotnet run --project Music.API/Music.API.csproj` + `dotnet run --project Music_portal/Music_portal.csproj`
+4. **React (отдельно):** `npm --prefix React_site install && npm --prefix React_site run dev` → `http://localhost:5173` (опционально, `SPA` уже в `Music_portal/Admin/Spa`)
 
-### 2. WebApi
-Для запуска серверной части выполните:
-```bash
-.\Music.API.sln
-```
+**Не запускать:** старые `Music.API.sln` (корень) и `Music_portal/Music_portal.sln` (в подпапке) — оставлены для совместимости, но главный — `MusicPortal.sln` в корне.
