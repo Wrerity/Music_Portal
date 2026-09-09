@@ -3,6 +3,7 @@ import Layout from './components/Layout.jsx'
 import Catalog from './pages/Catalog.jsx'
 import Login from './pages/Login.jsx'
 import Admin from './pages/Admin.jsx'
+import Chat from './pages/Chat.jsx'
 
 export default function App(){
   return (
@@ -12,6 +13,7 @@ export default function App(){
           <Route path="/" element={<Catalog/>} />
           <Route path="/login" element={<Login/>} />
           <Route path="/admin" element={<Admin/>} />
+          <Route path="/chat" element={<Chat/>} />
           <Route path="*" element={<div style={{fontSize:'14px'}}>404 — страница не найдена</div>} />
         </Routes>
       </Layout>

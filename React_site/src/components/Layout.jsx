@@ -12,6 +12,7 @@ export default function Layout({ children }) {
         <nav style={{display:'flex', gap:'12px', flexWrap:'wrap'}}>
           <Link to="/" style={linkStyle}>Каталог</Link>
           <Link to="/admin" style={linkStyle}>Админ SPA</Link>
+          <Link to="/chat" style={linkStyle}>Чат</Link>
         </nav>
         <div style={{marginLeft:'auto', display:'flex', gap:'8px', alignItems:'center'}}>
           {authed ? <button onClick={logout} style={btnStyle}>Выход</button> : <Link to="/login" style={btnStyleLink}>Вход</Link>}
