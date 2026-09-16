@@ -34,12 +34,17 @@ export default function Admin(){
 
   return (
     <div>
-      <h2 style={{fontSize:'20px'}}>Админ SPA — AJAX GET/POST/PUT/DELETE к Web API (разные домены)</h2>
+      <h2 style={{fontSize:'20px'}}>Админ панель</h2>
       <div style={{display:'flex', gap:'8px', marginBottom:'12px', flexWrap:'wrap'}}>
-        {['users','pending','genres','authors','songs'].map(t=>(
-          <button key={t} onClick={()=>setTab(t)} style={{padding:'8px 12px', fontSize:'14px', border:'1px solid #ccc', borderRadius:'6px', background:tab===t?'#e94560':'#fff', color:tab===t?'#fff':'#333', cursor:'pointer'}}>{t}</button>
+        {[
+          {key:'users', label:'Пользователи'},
+          {key:'pending', label:'Заявки'},
+          {key:'genres', label:'Жанры'},
+          {key:'authors', label:'Авторы'},
+          {key:'songs', label:'Песни'}
+        ].map(item=>(
+          <button key={item.key} onClick={()=>setTab(item.key)} style={{padding:'8px 12px', fontSize:'14px', border:'1px solid #ccc', borderRadius:'6px', background:tab===item.key?'var(--accent)':'#fff', color:tab===item.key?'#fff':'#333', cursor:'pointer'}}>{item.label}</button>
         ))}
-        <span style={{fontSize:'14px', marginLeft:'auto'}}>CORS: {window.location.origin} → https://localhost:7090</span>
       </div>
 
       {tab==='users' && <div><h3 style={h3}>Users GET</h3><button onClick={loadUsers} style={btn}>Обновить GET</button><table style={table}><thead><tr><th style={th}>ID</th><th style={th}>Username</th><th style={th}>Role</th><th style={th}>Действия (PUT/DELETE)</th></tr></thead><tbody>{users.map(u=><tr key={u.id||u.Id}><td style={td}>{u.id||u.Id}</td><td style={td}>{u.username||u.Username}</td><td style={td}>{u.role||u.Role}</td><td style={td}><button onClick={()=>deleteUser(u.id||u.Id)} style={btnDel}>DELETE</button></td></tr>)}</tbody></table></div>}
@@ -59,7 +64,7 @@ export default function Admin(){
   )
 }
 const h3={fontSize:'16px', margin:'12px 0 8px'}
-const btn={background:'#e94560', color:'#fff', border:'none', padding:'6px 10px', borderRadius:'6px', fontSize:'14px', cursor:'pointer'}
+const btn={background:'var(--accent)', color:'#fff', border:'none', padding:'6px 10px', borderRadius:'6px', fontSize:'14px', cursor:'pointer'}
 const btnDel={background:'#fff', border:'1px solid #c00', color:'#c00', padding:'6px 10px', borderRadius:'6px', fontSize:'14px', cursor:'pointer'}
 const table={width:'100%', borderCollapse:'collapse', marginTop:'8px'}
 const th={border:'1px solid #ddd', padding:'8px', fontSize:'14px', background:'#f5f5f5', textAlign:'left'}

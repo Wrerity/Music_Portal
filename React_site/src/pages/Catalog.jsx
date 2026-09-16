@@ -33,7 +33,7 @@ export default function Catalog() {
 
   return (
     <div>
-      <h2 style={h2}>Каталог — GET /api/songs (EF: сортировка/фильтрация/пагинация)</h2>
+      <h2 style={h2}>Каталог</h2>
       <div style={filters}>
         <div><label style={label}>Поиск</label><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Название..." style={input} /></div>
         <div><label style={label}>Жанр</label><select value={genreIds} onChange={e=>setGenreIds(e.target.value)} style={input}><option value="">Все жанры</option>{genres.map(g=><option key={g.id||g.Id} value={g.id||g.Id}>{g.name||g.Name}</option>)}</select></div>
@@ -57,7 +57,7 @@ export default function Catalog() {
           </div>
           <div style={{marginTop:'16px', display:'flex', gap:'6px', flexWrap:'wrap', justifyContent:'center'}}>
             {Array.from({length:data.totalPages},(_,i)=>i+1).map(p=>(
-              <button key={p} onClick={()=>load(p)} style={{...pageBtn, ...(p===page?{background:'#e94560',color:'#fff'}:{})}}>{p}</button>
+              <button key={p} onClick={()=>load(p)} style={{...pageBtn, ...(p===page?{background:'var(--accent)',color:'#fff'}:{})}}>{p}</button>
             ))}
           </div>
           <p style={{fontSize:'14px', textAlign:'center', marginTop:'8px'}}>Всего {data.totalCount} — стр. {page}/{data.totalPages}</p>
@@ -70,7 +70,7 @@ const h2={fontSize:'20px', marginBottom:'12px'}
 const filters={display:'grid', gridTemplateColumns:'1fr 1fr 1fr 1fr auto auto', gap:'8px', alignItems:'end', marginBottom:'16px', background:'#f5f5f5', padding:'12px', borderRadius:'8px'}
 const label={fontSize:'14px', fontWeight:600, display:'block', marginBottom:'4px'}
 const input={padding:'8px', fontSize:'14px', border:'1px solid #ccc', borderRadius:'6px', width:'100%'}
-const btn={background:'#e94560', color:'#fff', border:'none', padding:'8px 12px', borderRadius:'6px', fontSize:'14px', cursor:'pointer'}
+const btn={background:'var(--accent)', color:'#fff', border:'none', padding:'8px 12px', borderRadius:'6px', fontSize:'14px', cursor:'pointer'}
 const btn2={background:'#fff', border:'1px solid #ccc', padding:'8px 12px', borderRadius:'6px', fontSize:'14px', cursor:'pointer'}
 const grid={display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(240px,1fr))', gap:'12px'}
 const card={border:'1px solid #ddd', borderRadius:'8px', padding:'12px', background:'#fff'}

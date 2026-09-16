@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:5090',
+  baseURL: import.meta.env.DEV ? '' : 'http://localhost:5090',
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 })
@@ -16,12 +16,18 @@ api.interceptors.request.use(cfg => {
 api.interceptors.response.use(
   r => r,
   err => {
-    const msg = err.response?.data?.detail || err.response?.data?.title || err.message
-    // 401 -> сброс токена
-    if (err.response?.status === 401) {
-      localStorage.removeItem('token')
+    if (!err.response) {
+      return Promise.reject({ status: 0, data: null, message: `Network Error: API ${err.config?.baseURL}${err.config?.url} недоступен.` })
     }
-    return Promise.reject({ status: err.response?.status, data: err.response?.data, message: msg })
+    const data = err.response.data
+    let msg = data?.detail || data?.title || err.message
+    // Валидация 400 — показать поля
+    if (data?.errors) {
+      const fields = Object.entries(data.errors).map(([k,v])=> `${k}: ${Array.isArray(v)?v.join(', '):v}`).join('; ')
+      msg = fields || msg
+    }
+    if (err.response.status === 401) localStorage.removeItem('token')
+    return Promise.reject({ status: err.response.status, data, message: msg })
   }
 )
 
