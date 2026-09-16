@@ -32,7 +32,7 @@ public static class ApplicationBuilderExtensions
         });
         app.UseSwagger();
         app.UseSwaggerUI(o => { o.SwaggerEndpoint("/swagger/v1/swagger.json", "Music Portal API v1"); o.DefaultModelsExpandDepth(-1); });
-        app.UseHttpsRedirection();
+        // Убран UseHttpsRedirection для API — иначе http://localhost:5090 → 307 → ломает AJAX/CORS для React (5173)
         app.UseCors("ApiCorsPolicy");
         app.UseAuthentication();
         app.UseAuthorization();

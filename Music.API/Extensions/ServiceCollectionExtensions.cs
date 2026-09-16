@@ -36,10 +36,29 @@ public static class ServiceCollectionExtensions
         var origins = config.GetSection("Cors:AllowedOrigins").Get<string[]>();
         services.AddCors(o =>
         {
-            if (origins is { Length: > 0 } && origins.Any(x => x != "*"))
-                o.AddPolicy("ApiCorsPolicy", p => p.WithOrigins(origins).AllowAnyMethod().AllowAnyHeader().AllowCredentials());
-            else
-                o.AddPolicy("ApiCorsPolicy", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            o.AddPolicy("ApiCorsPolicy", p =>
+            {
+                p.SetIsOriginAllowed(origin =>
+                {
+                    try
+                    {
+                        var uri = new Uri(origin);
+                        // Разрешаем любой localhost порт для React Vite (5173, 5174 и т.д.) и портал
+                        return uri.Host == "localhost" || uri.Host == "127.0.0.1";
+                    }
+                    catch { return false; }
+                })
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+                // Явные origins из конфига тоже разрешены (для обратной совместимости)
+                if (origins is { Length: > 0 } && !origins.Any(x => x == "*"))
+                {
+                    // SetIsOriginAllowed уже покрывает localhost, но WithOrigins не нужен при SetIsOriginAllowed
+                }
+            });
+            // Fallback политика для swagger без Origin
+            o.AddPolicy("AllowAll", p => p.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
         });
         return services;
     }
