@@ -54,5 +54,5 @@ const h2={fontSize:'22px', marginBottom:'12px'}
 const form={display:'flex', flexDirection:'column', gap:'8px', background:'#f5f5f5', padding:'16px', borderRadius:'8px'}
 const label={fontSize:'14px', fontWeight:600}
 const input={padding:'8px', fontSize:'14px', border:'1px solid #ccc', borderRadius:'6px'}
-const btn={background:'#e94560', color:'#fff', border:'none', padding:'8px 14px', borderRadius:'6px', fontSize:'14px', cursor:'pointer', flex:1}
+const btn={background:'var(--accent)', color:'#fff', border:'none', padding:'8px 14px', borderRadius:'6px', fontSize:'14px', cursor:'pointer', flex:1}
 const btn2={background:'#fff', color:'#333', border:'1px solid #ccc', padding:'8px 14px', borderRadius:'6px', fontSize:'14px', cursor:'pointer', flex:1}
