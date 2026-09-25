@@ -17,7 +17,20 @@ export default function Admin(){
   const loadAuthors=async()=>{ const {data}=await api.get('/api/authors'); setAuthors(data) }
   const loadSongs=async()=>{ const {data}=await api.get('/api/admin/songs?page=1&pageSize=20'); setSongs(data.songs||data.Songs||[]) }
 
-  useEffect(()=>{ loadUsers(); loadPending(); loadGenres(); loadAuthors(); loadSongs() },[tab])
+  useEffect(()=>{
+    let cancelled = false
+    const fetchTab = async () => {
+      try {
+        if(tab==='users'){ const {data}=await api.get('/api/users?page=1&pageSize=20'); if(!cancelled) setUsers(data.users||data.Users||[]) }
+        else if(tab==='pending'){ const {data}=await api.get('/api/users/pending'); if(!cancelled) setPending(data) }
+        else if(tab==='genres'){ const {data}=await api.get('/api/genres'); if(!cancelled) setGenres(data) }
+        else if(tab==='authors'){ const {data}=await api.get('/api/authors'); if(!cancelled) setAuthors(data) }
+        else if(tab==='songs'){ const {data}=await api.get('/api/admin/songs?page=1&pageSize=20'); if(!cancelled) setSongs(data.songs||data.Songs||[]) }
+      } catch(e){ console.error(e) }
+    }
+    fetchTab()
+    return ()=>{ cancelled = true }
+  },[tab])
 
   const createGenre=async()=>{ await api.post('/api/genres', {name:form.name, description:form.description}); setForm({name:'',description:''}); loadGenres() }
   const updateGenre=async()=>{ if(!editId) return; await api.put(`/api/genres/${editId}`, {id:editId, name:form.name, description:form.description}); setEditId(null); setForm({name:'',description:''}); loadGenres() }

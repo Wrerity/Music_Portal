@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import api from '../api/client.js'
 
 export default function Catalog() {
@@ -29,7 +28,19 @@ export default function Catalog() {
       setPage(p)
     } catch(e){ console.error(e) } finally{ setLoading(false) }
   }
-  useEffect(()=>{ load(1) },[])
+  // Первичная загрузка при монтировании (фильтры по умолчанию, без зависимости от load)
+  useEffect(()=>{
+    let cancelled = false
+    const init = async () => {
+      setLoading(true)
+      try {
+        const { data } = await api.get('/api/songs?page=1')
+        if(!cancelled) setData({ songs: data.songs || data.Songs || [], totalPages: data.totalPages ?? data.TotalPages ?? 1, totalCount: data.totalCount ?? data.TotalCount ?? 0 })
+      } catch(e){ console.error(e) } finally{ if(!cancelled) setLoading(false) }
+    }
+    init()
+    return ()=>{ cancelled = true }
+  }, [])
 
   return (
     <div>
@@ -51,7 +62,6 @@ export default function Catalog() {
                 <div style={{fontWeight:700, fontSize:'15px'}}>{s.title||s.Title}</div>
                 <div style={{fontSize:'14px', opacity:0.7}}>{s.authors||s.Authors} — {s.genres||s.Genres}</div>
                 <div style={{fontSize:'14px'}}>{s.playCount||s.PlayCount} слушателей</div>
-                <Link to={`/song/${s.id||s.Id}`} style={{fontSize:'14px'}}>Подробнее</Link>
               </div>
             ))}
           </div>
